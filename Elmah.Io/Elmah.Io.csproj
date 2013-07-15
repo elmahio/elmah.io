@@ -67,7 +67,16 @@
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
   </Target>
-  <Target Name="AfterBuild">
-  </Target>
   -->
+  <UsingTask TaskName="ILMerge.MSBuild.Tasks.ILMerge" AssemblyFile="$(SolutionDir)\packages\ILMerge.MSBuild.Tasks.1.0.0.3\tools\ILMerge.MSBuild.Tasks.dll" />
+  <Target Name="AfterBuild">
+    <ItemGroup>
+      <MergeAsm Include="bin\$(Configuration)\Elmah.Io.dll" />
+      <MergeAsm Include="bin\$(Configuration)\Newtonsoft.Json.dll" />
+    </ItemGroup>
+    <PropertyGroup>
+      <MergedAssembly>$(ProjectDir)$(OutDir)elmah.io.merged.dll</MergedAssembly>
+    </PropertyGroup>
+    <ILMerge InputAssemblies="@(MergeAsm)" OutputFile="$(MergedAssembly)" Internalize="true" />
+  </Target>
 </Project>
