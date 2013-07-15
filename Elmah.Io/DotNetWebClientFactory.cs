@@ -1,6 +1,6 @@
 ﻿namespace Elmah.Io
 {
-    public class DotNetWebClientFactory : IWebClientFactory
+    internal class DotNetWebClientFactory : IWebClientFactory
     {
         public IWebClient Create()
         {

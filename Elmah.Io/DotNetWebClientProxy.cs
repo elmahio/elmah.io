@@ -3,7 +3,7 @@ using System.Net;
 
 namespace Elmah.Io
 {
-    public class DotNetWebClientProxy : IWebClient
+    internal class DotNetWebClientProxy : IWebClient
     {
         private readonly WebClient _webClient;
 
