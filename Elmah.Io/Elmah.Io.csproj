@@ -75,7 +75,7 @@
       <MergeAsm Include="bin\$(Configuration)\Newtonsoft.Json.dll" />
     </ItemGroup>
     <PropertyGroup>
-      <MergedAssembly>$(ProjectDir)$(OutDir)elmah.io.merged.dll</MergedAssembly>
+      <MergedAssembly>$(ProjectDir)$(OutDir)Elmah.Io.dll</MergedAssembly>
     </PropertyGroup>
     <ILMerge InputAssemblies="@(MergeAsm)" OutputFile="$(MergedAssembly)" Internalize="true" />
   </Target>
