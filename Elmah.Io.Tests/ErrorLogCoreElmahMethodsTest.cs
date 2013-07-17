@@ -68,7 +68,7 @@ namespace Elmah.Io.Tests
             var result = errorLog.GetError(id);
 
             Assert.That(result, Is.Not.Null);
-            Assert.That(actualUri.AbsoluteUri, Is.Not.Null.And.StringEnding(string.Format("api/logs/{0}&logId={1}", id, logId)));
+            Assert.That(actualUri.AbsoluteUri, Is.Not.Null.And.StringEnding(string.Format("api/logs?id={0}&logId={1}", id, logId)));
             Assert.That(result, Is.Not.Null);
             Assert.That(result.Error, Is.Not.Null);
             Assert.That(result.Error.Type, Is.EqualTo("System.ApplicationException"));
