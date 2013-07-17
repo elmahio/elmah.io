@@ -52,7 +52,7 @@ namespace Elmah.Io
 
         public override ErrorLogEntry GetError(string id)
         {
-            var url = new Uri(_url, string.Format("api/logs/{0}&logId={1}", id, _logId));
+            var url = new Uri(_url, string.Format("api/logs?id={0}&logId={1}", id, _logId));
             string response;
             using (var webClient = _webClientFactory.Create())
             {
