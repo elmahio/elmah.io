@@ -58,6 +58,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ErrorLogCoreElmahMethodsTest.cs" />
+    <Compile Include="ErrorLogCustomUrlTest.cs" />
     <Compile Include="ErrorLogErrorHandlingTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

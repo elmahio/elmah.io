@@ -9,7 +9,7 @@ namespace Elmah.Io
     public class ErrorLog : Elmah.ErrorLog
     {
         private readonly string _logId;
-        private readonly Uri _url = new Uri("http://elmahio.azurewebsites.net/");
+        private Uri _url = new Uri("http://elmahio.azurewebsites.net/");
         private readonly IWebClientFactory _webClientFactory;
 
         public ErrorLog(IDictionary config) : this(config, new DotNetWebClientFactory())
@@ -35,6 +35,18 @@ namespace Elmah.Io
             }
 
             _logId = result.ToString();
+
+            if (config.Contains("Url"))
+            {
+                Uri uri;
+                if (!Uri.TryCreate(config["Url"].ToString(), UriKind.Absolute, out uri))
+                {
+                    throw new ApplicationException("Invalid URL. Please specify a valid absolute url. In fact you don't even need to specify an url, which will make the error logger use the elmah.io backend.");
+                }
+
+                _url = new Uri(config["Url"].ToString());
+            }
+
             _webClientFactory = webClientFactory;
         }
 

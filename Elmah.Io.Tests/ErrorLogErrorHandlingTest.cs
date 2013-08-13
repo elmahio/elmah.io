@@ -26,5 +26,12 @@ namespace Elmah.Io.Tests
             var exception = Assert.Throws<ApplicationException>(() => new ErrorLog(new Hashtable { { "LogId", "NoGuid" } }));
             Assert.That(exception.Message, Is.StringContaining("Invalid LogId"));
         }
+
+        [Test]
+        public void AssertThrowsExplainingApplicationExceptionOnInvalidUrl()
+        {
+            var exception = Assert.Throws<ApplicationException>(() => new ErrorLog(new Hashtable { { "LogId", Guid.NewGuid().ToString() }, { "Url", "NoUrl" } }));
+            Assert.That(exception.Message, Is.StringContaining("Invalid URL"));
+        }
     }
 }
