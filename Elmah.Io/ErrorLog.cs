@@ -1,15 +1,14 @@
-﻿using System;
+﻿using Mannex;
+using Mannex.Web;
+using Newtonsoft.Json;
+using System;
 using System.Collections;
+using System.Collections.Specialized;
 using System.Net;
 using System.Web;
-using Newtonsoft.Json;
 
 namespace Elmah.Io
 {
-    using System.Collections.Specialized;
-    using Mannex;
-    using Mannex.Web;
-
     public class ErrorLog : Elmah.ErrorLog
     {
         private readonly string _logId;
