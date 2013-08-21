@@ -68,7 +68,7 @@
   <Target Name="BeforeBuild">
   </Target>
   -->
-  <UsingTask TaskName="ILMerge.MSBuild.Tasks.ILMerge" AssemblyFile="$(SolutionDir)\packages\ILMerge.MSBuild.Tasks.1.0.0.3\tools\ILMerge.MSBuild.Tasks.dll" />
+  <UsingTask TaskName="ILMerge.MSBuild.Tasks.ILMerge" AssemblyFile="$(SolutionDir)\packages\ILMerge.MSBuild.Tasks.1.0.0.3\tools\ILMerge.MSBuild.Tasks.dll" Condition="$(Configuration) == 'Release'" />
   <Target Name="AfterBuild">
     <ItemGroup>
       <MergeAsm Include="bin\$(Configuration)\Elmah.Io.dll" />
@@ -77,6 +77,6 @@
     <PropertyGroup>
       <MergedAssembly>$(ProjectDir)$(OutDir)Elmah.Io.dll</MergedAssembly>
     </PropertyGroup>
-    <ILMerge InputAssemblies="@(MergeAsm)" OutputFile="$(MergedAssembly)" Internalize="true" />
+    <ILMerge InputAssemblies="@(MergeAsm)" OutputFile="$(MergedAssembly)" Internalize="true" Condition="$(Configuration) == 'Release'" />
   </Target>
 </Project>
