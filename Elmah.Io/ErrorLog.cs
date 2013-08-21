@@ -6,10 +6,14 @@ using Newtonsoft.Json;
 
 namespace Elmah.Io
 {
+    using System.Collections.Specialized;
+    using Mannex;
+    using Mannex.Web;
+
     public class ErrorLog : Elmah.ErrorLog
     {
         private readonly string _logId;
-        private Uri _url = new Uri("http://elmahio.azurewebsites.net/");
+        private readonly Uri _url = new Uri("http://elmahio.azurewebsites.net/");
         private readonly IWebClientFactory _webClientFactory;
 
         public ErrorLog(IDictionary config) : this(config, new DotNetWebClientFactory())
@@ -50,25 +54,33 @@ namespace Elmah.Io
             _webClientFactory = webClientFactory;
         }
 
+        Uri ApiUrl(NameValueCollection query = null)
+        {
+            var q = new NameValueCollection
+            {
+                { "logId", _logId }, 
+                query ?? new NameValueCollection()
+            };
+            return new Uri(_url, "api/logs" + q.ToQueryString());
+        }
+
         public override string Log(Error error)
         {
-            var url = new Uri(_url, string.Format("api/logs?logId={0}", _logId));
             using (var webClient = _webClientFactory.Create())
             {
                 webClient.Headers[HttpRequestHeader.ContentType] = "application/x-www-form-urlencoded";
                 var xml = ErrorXml.EncodeString(error);
 
-                return webClient.Post(url, "=" + HttpUtility.UrlEncode(xml));
+                return webClient.Post(ApiUrl(), "=" + HttpUtility.UrlEncode(xml));
             }
         }
 
         public override ErrorLogEntry GetError(string id)
         {
-            var url = new Uri(_url, string.Format("api/logs?id={0}&logId={1}", id, _logId));
             string response;
             using (var webClient = _webClientFactory.Create())
             {
-                response = webClient.Get(url);
+                response = webClient.Get(ApiUrl(new NameValueCollection { { "id", id } }));
             }
 
             dynamic d = JsonConvert.DeserializeObject(response);
@@ -77,7 +89,11 @@ namespace Elmah.Io
 
         public override int GetErrors(int pageIndex, int pageSize, IList errorEntryList)
         {
-            var url = new Uri(_url, string.Format("api/logs?logId={0}&pageindex={1}&pagesize={2}", _logId, pageIndex, pageSize));
+            var url = ApiUrl(new NameValueCollection
+            {
+                { "pageindex", pageIndex.ToInvariantString() }, 
+                { "pagesize", pageSize.ToInvariantString() }, 
+            });
             string response;
             using (var webClient = _webClientFactory.Create())
             {
