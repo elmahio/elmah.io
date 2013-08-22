@@ -85,12 +85,12 @@ namespace Elmah.Io
             }
 
             dynamic d = JsonConvert.DeserializeObject(response);
-            foreach (dynamic error in d)
+            foreach (dynamic error in d.Errors)
             {
                 errorEntryList.Add(MapErrorLogEntry(error.Id, error.ErrorXml));
             }
 
-            return errorEntryList.Count;
+            return d.Total;
         }
 
         private ErrorLogEntry MapErrorLogEntry(dynamic id, dynamic xml)
