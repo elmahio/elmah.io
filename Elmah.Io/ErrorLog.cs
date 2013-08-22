@@ -52,7 +52,7 @@ namespace Elmah.Io
 
         public override string Log(Error error)
         {
-            var url = new Uri(_url, string.Format("api/logs?logId={0}", _logId));
+            var url = new Uri(_url, string.Format("api/logs2?logId={0}", _logId));
             using (var webClient = _webClientFactory.Create())
             {
                 webClient.Headers[HttpRequestHeader.ContentType] = "application/x-www-form-urlencoded";
@@ -64,7 +64,7 @@ namespace Elmah.Io
 
         public override ErrorLogEntry GetError(string id)
         {
-            var url = new Uri(_url, string.Format("api/logs?id={0}&logId={1}", id, _logId));
+            var url = new Uri(_url, string.Format("api/logs2?id={0}&logId={1}", id, _logId));
             string response;
             using (var webClient = _webClientFactory.Create())
             {
@@ -77,7 +77,7 @@ namespace Elmah.Io
 
         public override int GetErrors(int pageIndex, int pageSize, IList errorEntryList)
         {
-            var url = new Uri(_url, string.Format("api/logs?logId={0}&pageindex={1}&pagesize={2}", _logId, pageIndex, pageSize));
+            var url = new Uri(_url, string.Format("api/logs2?logId={0}&pageindex={1}&pagesize={2}", _logId, pageIndex, pageSize));
             string response;
             using (var webClient = _webClientFactory.Create())
             {
