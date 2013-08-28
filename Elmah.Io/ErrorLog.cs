@@ -60,7 +60,7 @@ namespace Elmah.Io
                 { "logId", _logId }, 
                 query ?? new NameValueCollection()
             };
-            return new Uri(_url, "api/logs" + q.ToQueryString());
+            return new Uri(_url, "api/logs2" + q.ToQueryString());
         }
 
         public override string Log(Error error)
@@ -100,12 +100,12 @@ namespace Elmah.Io
             }
 
             dynamic d = JsonConvert.DeserializeObject(response);
-            foreach (dynamic error in d)
+            foreach (dynamic error in d.Errors)
             {
                 errorEntryList.Add(MapErrorLogEntry(error.Id, error.ErrorXml));
             }
 
-            return errorEntryList.Count;
+            return d.Total;
         }
 
         private ErrorLogEntry MapErrorLogEntry(dynamic id, dynamic xml)
