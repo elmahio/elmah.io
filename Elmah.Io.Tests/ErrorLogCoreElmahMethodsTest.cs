@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Globalization;
 using System.Net;
+using System.Threading.Tasks;
 using Moq;
 using Newtonsoft.Json;
 using NUnit.Framework;
@@ -33,7 +34,7 @@ namespace Elmah.Io.Tests
             webClientMock
                 .Setup(x => x.Post(It.IsAny<WebHeaderCollection>(), It.IsAny<Uri>(), It.IsAny<string>(), It.IsAny<Func<WebHeaderCollection, string, string>>()))
                 .Callback<WebHeaderCollection, Uri, string, Func<WebHeaderCollection, string, string>>((headers, uri, data, resultor) => { requestHeaders = headers; actualUri = uri; actualData = data; })
-                .Returns(id);
+                .Returns(Task.FromResult(id));
 
             var errorLog = new ErrorLog(new Hashtable { { "LogId", logId } }, webClientMock.Object);
 
@@ -57,7 +58,7 @@ namespace Elmah.Io.Tests
             webClientMock
                 .Setup(x => x.Get(It.IsAny<WebHeaderCollection>(), It.IsAny<Uri>(), It.IsAny<Func<WebHeaderCollection, string, string>>()))
                 .Callback<WebHeaderCollection, Uri, Func<WebHeaderCollection, string, string>>((headers, uri, resultor) => { actualUri = uri; })
-                .Returns(JsonConvert.SerializeObject(error));
+                .Returns(Task.FromResult(JsonConvert.SerializeObject(error)));
             
             var errorLog = new ErrorLog(new Hashtable { { "LogId", logId } }, webClientMock.Object);
 
@@ -91,7 +92,7 @@ namespace Elmah.Io.Tests
             webClientMock
                 .Setup(x => x.Get(It.IsAny<WebHeaderCollection>(), It.IsAny<Uri>(), It.IsAny<Func<WebHeaderCollection, string, string>>()))
                 .Callback<WebHeaderCollection, Uri, Func<WebHeaderCollection, string, string>>((headers, uri, resultor) => { actualUri = uri; })
-                .Returns(JsonConvert.SerializeObject(errors));
+                .Returns(Task.FromResult(JsonConvert.SerializeObject(errors)));
 
             var errorLog = new ErrorLog(new Hashtable { { "LogId", logId } }, webClientMock.Object);
 
