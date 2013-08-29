@@ -10,11 +10,14 @@ namespace Elmah.Io
             if (address == null) throw new ArgumentNullException("address");
             if (resultor == null) throw new ArgumentNullException("resultor");
             
-            using (var wc = new WebClient())
+            using (var webClient = new WebClient())
             {
-                if (headers != null) 
-                    wc.Headers.Add(headers);
-                return resultor(wc.ResponseHeaders, wc.UploadString(address, data));
+                if (headers != null)
+                {
+                    webClient.Headers.Add(headers);
+                }
+
+                return resultor(webClient.ResponseHeaders, webClient.UploadString(address, data));
             }
         }
 
@@ -23,11 +26,14 @@ namespace Elmah.Io
             if (address == null) throw new ArgumentNullException("address");
             if (resultor == null) throw new ArgumentNullException("resultor");
 
-            using (var wc = new WebClient())
+            using (var webClient = new WebClient())
             {
-                if (headers != null) 
-                    wc.Headers.Add(headers);
-                return resultor(wc.ResponseHeaders, wc.DownloadString(address));
+                if (headers != null)
+                {
+                    webClient.Headers.Add(headers);
+                }
+
+                return resultor(webClient.ResponseHeaders, webClient.DownloadString(address));
             }
         }
     }
