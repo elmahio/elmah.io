@@ -14,13 +14,13 @@ namespace Elmah.Io
     {
         private readonly string _logId;
         private readonly Uri _url = new Uri("http://elmahio.azurewebsites.net/");
-        private readonly IWebClientFactory _webClientFactory;
+        private readonly IWebClient _webClient;
 
-        public ErrorLog(IDictionary config) : this(config, new DotNetWebClientFactory())
+        public ErrorLog(IDictionary config) : this(config, new DotNetWebClientProxy())
         {
         }
 
-        public ErrorLog(IDictionary config, IWebClientFactory webClientFactory)
+        public ErrorLog(IDictionary config, IWebClient webClient)
         {
             if (config == null)
             {
@@ -51,7 +51,7 @@ namespace Elmah.Io
                 _url = new Uri(config["Url"].ToString());
             }
 
-            _webClientFactory = webClientFactory;
+            _webClient = webClient;
         }
 
         Uri ApiUrl(NameValueCollection query = null)
@@ -66,23 +66,14 @@ namespace Elmah.Io
 
         public override string Log(Error error)
         {
-            using (var webClient = _webClientFactory.Create())
-            {
-                webClient.Headers[HttpRequestHeader.ContentType] = "application/x-www-form-urlencoded";
-                var xml = ErrorXml.EncodeString(error);
-
-                return webClient.Post(ApiUrl(), "=" + HttpUtility.UrlEncode(xml));
-            }
+            var headers = new WebHeaderCollection { { HttpRequestHeader.ContentType, "application/x-www-form-urlencoded" } };
+            var xml = ErrorXml.EncodeString(error);
+            return _webClient.Post(headers, ApiUrl(), "=" + HttpUtility.UrlEncode(xml));
         }
 
         public override ErrorLogEntry GetError(string id)
         {
-            string response;
-            using (var webClient = _webClientFactory.Create())
-            {
-                response = webClient.Get(ApiUrl(new NameValueCollection { { "id", id } }));
-            }
-
+            var response = _webClient.Get(ApiUrl(new NameValueCollection { { "id", id } }));
             dynamic error = JsonConvert.DeserializeObject(response);
             return MapErrorLogEntry((string) error.Id, (string) error.ErrorXml);
         }
@@ -94,11 +85,8 @@ namespace Elmah.Io
                 { "pageindex", pageIndex.ToInvariantString() }, 
                 { "pagesize", pageSize.ToInvariantString() }, 
             });
-            string response;
-            using (var webClient = _webClientFactory.Create())
-            {
-                response = webClient.Get(url);
-            }
+            
+            var response = _webClient.Get(url);
 
             dynamic d = JsonConvert.DeserializeObject(response);
 

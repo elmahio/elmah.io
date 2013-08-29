@@ -51,11 +51,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="DotNetWebClientFactory.cs" />
     <Compile Include="DotNetWebClientProxy.cs" />
     <Compile Include="ErrorLog.cs" />
     <Compile Include="IWebClient.cs" />
-    <Compile Include="IWebClientFactory.cs" />
     <Compile Include="Mannex\Int32.cs" />
     <Compile Include="Mannex\Web\NameValueCollection.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

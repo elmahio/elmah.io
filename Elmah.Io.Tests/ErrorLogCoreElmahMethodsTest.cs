@@ -13,16 +13,11 @@ namespace Elmah.Io.Tests
     {
         private const string ErrorXml = "<error host=\"localhost\" type=\"System.ApplicationException\" message=\"Error in the application.\" detail=\"System.ApplicationException: Error in the application.\" time=\"2013-07-13T06:16:03.9957581Z\" />";
         private Fixture _fixture;
-        private Mock<IWebClientFactory> _webClientFactoryMock;
-        private Mock<IWebClient> _webClientMock;
 
         [SetUp]
         public void SetUp()
         {
             _fixture = new Fixture();
-            _webClientFactoryMock = new Mock<IWebClientFactory>();
-            _webClientMock = new Mock<IWebClient>();
-            _webClientFactoryMock.Setup(x => x.Create()).Returns(_webClientMock.Object);
         }
 
         [Test]
@@ -33,19 +28,19 @@ namespace Elmah.Io.Tests
             Uri actualUri = null;
             string actualData = null;
 
-            var webHeaderCollection = new WebHeaderCollection();
-            _webClientMock.SetupGet(x => x.Headers).Returns(webHeaderCollection);
-            _webClientMock
-                .Setup(x => x.Post(It.IsAny<Uri>(), It.IsAny<string>()))
-                .Callback<Uri, string>((uri, data) => { actualUri = uri; actualData = data; })
+            var requestHeaders = new WebHeaderCollection();
+            var webClientMock = new Mock<IWebClient>();
+            webClientMock
+                .Setup(x => x.Post(It.IsAny<WebHeaderCollection>(), It.IsAny<Uri>(), It.IsAny<string>(), It.IsAny<Func<WebHeaderCollection, string, string>>()))
+                .Callback<WebHeaderCollection, Uri, string, Func<WebHeaderCollection, string, string>>((headers, uri, data, resultor) => { requestHeaders = headers; actualUri = uri; actualData = data; })
                 .Returns(id);
 
-            var errorLog = new ErrorLog(new Hashtable { { "LogId", logId } }, _webClientFactoryMock.Object);
+            var errorLog = new ErrorLog(new Hashtable { { "LogId", logId } }, webClientMock.Object);
 
             var result = errorLog.Log(new Error(new System.ApplicationException()));
 
             Assert.That(result, Is.EqualTo(id));
-            Assert.That(webHeaderCollection[HttpRequestHeader.ContentType], Is.EqualTo("application/x-www-form-urlencoded"));
+            Assert.That(requestHeaders[HttpRequestHeader.ContentType], Is.EqualTo("application/x-www-form-urlencoded"));
             Assert.That(actualUri.AbsoluteUri, Is.Not.Null.And.StringEnding(string.Format("api/logs2?logId={0}", logId)));
             Assert.That(actualData, Is.Not.Null.And.StringStarting("=").And.StringContaining("ApplicationException"));
         }
@@ -58,12 +53,13 @@ namespace Elmah.Io.Tests
             var error = new { Id = id, ErrorXml };
             Uri actualUri = null;
 
-            _webClientMock
-                .Setup(x => x.Get(It.IsAny<Uri>()))
-                .Callback<Uri>(uri => { actualUri = uri; })
+            var webClientMock = new Mock<IWebClient>();
+            webClientMock
+                .Setup(x => x.Get(It.IsAny<WebHeaderCollection>(), It.IsAny<Uri>(), It.IsAny<Func<WebHeaderCollection, string, string>>()))
+                .Callback<WebHeaderCollection, Uri, Func<WebHeaderCollection, string, string>>((headers, uri, resultor) => { actualUri = uri; })
                 .Returns(JsonConvert.SerializeObject(error));
             
-            var errorLog = new ErrorLog(new Hashtable { { "LogId", logId } }, _webClientFactoryMock.Object);
+            var errorLog = new ErrorLog(new Hashtable { { "LogId", logId } }, webClientMock.Object);
 
             var result = errorLog.GetError(id);
 
@@ -91,12 +87,13 @@ namespace Elmah.Io.Tests
             };
             Uri actualUri = null;
 
-            _webClientMock
-                .Setup(x => x.Get(It.IsAny<Uri>()))
-                .Callback<Uri>(uri => { actualUri = uri; })
+            var webClientMock = new Mock<IWebClient>();
+            webClientMock
+                .Setup(x => x.Get(It.IsAny<WebHeaderCollection>(), It.IsAny<Uri>(), It.IsAny<Func<WebHeaderCollection, string, string>>()))
+                .Callback<WebHeaderCollection, Uri, Func<WebHeaderCollection, string, string>>((headers, uri, resultor) => { actualUri = uri; })
                 .Returns(JsonConvert.SerializeObject(errors));
 
-            var errorLog = new ErrorLog(new Hashtable { { "LogId", logId } }, _webClientFactoryMock.Object);
+            var errorLog = new ErrorLog(new Hashtable { { "LogId", logId } }, webClientMock.Object);
 
             var results = new ArrayList();
             var count = errorLog.GetErrors(pageIndex, pageSize, results);
