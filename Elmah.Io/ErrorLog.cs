@@ -1,11 +1,12 @@
-﻿using Mannex;
-using Mannex.Web;
-using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Specialized;
+using System.Linq;
 using System.Net;
 using System.Web;
+using Mannex;
+using Mannex.Web;
+using Newtonsoft.Json;
 
 namespace Elmah.Io
 {
@@ -82,8 +83,8 @@ namespace Elmah.Io
                 response = webClient.Get(ApiUrl(new NameValueCollection { { "id", id } }));
             }
 
-            dynamic d = JsonConvert.DeserializeObject(response);
-            return MapErrorLogEntry(d.Id, d.ErrorXml);
+            dynamic error = JsonConvert.DeserializeObject(response);
+            return MapErrorLogEntry((string) error.Id, (string) error.ErrorXml);
         }
 
         public override int GetErrors(int pageIndex, int pageSize, IList errorEntryList)
@@ -100,17 +101,22 @@ namespace Elmah.Io
             }
 
             dynamic d = JsonConvert.DeserializeObject(response);
-            foreach (dynamic error in d.Errors)
+
+            var entries = from dynamic e in (IEnumerable) d.Errors
+                          select MapErrorLogEntry((string) e.Id, 
+                                                  (string) e.ErrorXml);
+
+            foreach (var entry in entries)
             {
-                errorEntryList.Add(MapErrorLogEntry(error.Id, error.ErrorXml));
+                errorEntryList.Add(entry);
             }
 
             return d.Total;
         }
 
-        private ErrorLogEntry MapErrorLogEntry(dynamic id, dynamic xml)
+        private ErrorLogEntry MapErrorLogEntry(string id, string xml)
         {
-            return new ErrorLogEntry(this, (string)id, ErrorXml.DecodeString((string)xml));
+            return new ErrorLogEntry(this, id, ErrorXml.DecodeString(xml));
         }
     }
 }
