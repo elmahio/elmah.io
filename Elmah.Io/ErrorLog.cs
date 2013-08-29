@@ -54,16 +54,6 @@ namespace Elmah.Io
             _webClient = webClient;
         }
 
-        Uri ApiUrl(NameValueCollection query = null)
-        {
-            var q = new NameValueCollection
-            {
-                { "logId", _logId }, 
-                query ?? new NameValueCollection()
-            };
-            return new Uri(_url, "api/logs2" + q.ToQueryString());
-        }
-
         public override string Log(Error error)
         {
             var headers = new WebHeaderCollection { { HttpRequestHeader.ContentType, "application/x-www-form-urlencoded" } };
@@ -105,6 +95,16 @@ namespace Elmah.Io
         private ErrorLogEntry MapErrorLogEntry(string id, string xml)
         {
             return new ErrorLogEntry(this, id, ErrorXml.DecodeString(xml));
+        }
+
+        Uri ApiUrl(NameValueCollection query = null)
+        {
+            var q = new NameValueCollection
+            {
+                { "logId", _logId }, 
+                query ?? new NameValueCollection()
+            };
+            return new Uri(_url, "api/logs2" + q.ToQueryString());
         }
     }
 }
