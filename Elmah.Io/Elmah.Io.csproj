@@ -58,6 +58,7 @@
     <Compile Include="Mannex\Int32.cs" />
     <Compile Include="Mannex\Web\NameValueCollection.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="WebClientExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
