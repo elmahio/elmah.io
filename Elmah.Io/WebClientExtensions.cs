@@ -13,15 +13,14 @@ namespace Elmah.Io
             if (address == null) throw new ArgumentNullException("address");
 
             var task = client.EventAsync
-                (
-                    (EventHandler<DownloadStringCompletedEventArgs> handler) => new DownloadStringCompletedEventHandler((sender, args) => handler(sender, args)), 
-                    (wc, handler) => wc.DownloadStringCompleted += handler, 
-                    (wc, handler) => wc.DownloadStringCompleted -= handler, 
-                    args => args.Result
-                );
+            (
+                (EventHandler<DownloadStringCompletedEventArgs> handler) => new DownloadStringCompletedEventHandler((sender, args) => handler(sender, args)), 
+                (wc, handler) => wc.DownloadStringCompleted += handler, 
+                (wc, handler) => wc.DownloadStringCompleted -= handler, 
+                args => args.Result
+            );
             
-            client.DownloadStringAsync(address);
-            
+            client.DownloadStringAsync(address);            
             return task;
         }        
 
@@ -31,15 +30,14 @@ namespace Elmah.Io
             if (address == null) throw new ArgumentNullException("address");
 
             var task = client.EventAsync
-                (
-                    (EventHandler<UploadStringCompletedEventArgs> handler) => new UploadStringCompletedEventHandler((sender, args) => handler(sender, args)), 
-                    (wc, handler) => wc.UploadStringCompleted += handler, 
-                    (wc, handler) => wc.UploadStringCompleted -= handler, 
-                    args => args.Result
-                );
+            (
+                (EventHandler<UploadStringCompletedEventArgs> handler) => new UploadStringCompletedEventHandler((sender, args) => handler(sender, args)), 
+                (wc, handler) => wc.UploadStringCompleted += handler, 
+                (wc, handler) => wc.UploadStringCompleted -= handler, 
+                args => args.Result
+            );
 
             client.UploadStringAsync(address, data);
-
             return task;
         }
 
