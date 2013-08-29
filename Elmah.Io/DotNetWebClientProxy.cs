@@ -5,34 +5,29 @@ namespace Elmah.Io
 {
     internal class DotNetWebClientProxy : IWebClient
     {
-        private readonly WebClient _webClient;
-
-        public DotNetWebClientProxy()
+        public T Post<T>(WebHeaderCollection headers, Uri address, string data, Func<WebHeaderCollection, string, T> resultor)
         {
-            _webClient = new WebClient();
-        }
-
-        public WebHeaderCollection Headers
-        {
-            get { return _webClient.Headers; }
-            set { _webClient.Headers = value; }
-        }
-
-        public string Get(Uri address)
-        {
-            return _webClient.DownloadString(address);
-        }
-
-        public string Post(Uri address, string data)
-        {
-            return _webClient.UploadString(address, data);
-        }
-
-        public void Dispose()
-        {
-            if (_webClient != null)
+            if (address == null) throw new ArgumentNullException("address");
+            if (resultor == null) throw new ArgumentNullException("resultor");
+            
+            using (var wc = new WebClient())
             {
-                _webClient.Dispose();
+                if (headers != null) 
+                    wc.Headers.Add(headers);
+                return resultor(wc.ResponseHeaders, wc.UploadString(address, data));
+            }
+        }
+
+        public T Get<T>(WebHeaderCollection headers, Uri address, Func<WebHeaderCollection, string, T> resultor)
+        {
+            if (address == null) throw new ArgumentNullException("address");
+            if (resultor == null) throw new ArgumentNullException("resultor");
+
+            using (var wc = new WebClient())
+            {
+                if (headers != null) 
+                    wc.Headers.Add(headers);
+                return resultor(wc.ResponseHeaders, wc.DownloadString(address));
             }
         }
     }
