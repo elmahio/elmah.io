@@ -51,15 +51,27 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AsyncExtensions.cs" />
     <Compile Include="DotNetWebClientProxy.cs" />
     <Compile Include="ErrorLog.cs" />
     <Compile Include="IWebClient.cs" />
     <Compile Include="IWebClientExtensions.cs" />
     <Compile Include="Mannex\Int32.cs" />
+    <Compile Include="Mannex\Net\Mime\ContentType.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Mannex\Net\WebHeaderCollection.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="Mannex\Threading\Tasks\Task.cs" />
+    <Compile Include="Mannex\Threading\Tasks\TaskCompletionSource.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Mannex\Threading\Tasks\TaskFactory.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="Mannex\Web\NameValueCollection.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="WebClientExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
