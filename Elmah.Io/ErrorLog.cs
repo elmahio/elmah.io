@@ -6,6 +6,7 @@ using System.Net;
 using System.Threading.Tasks;
 using System.Web;
 using Mannex;
+using Mannex.Threading.Tasks;
 using Mannex.Web;
 using Newtonsoft.Json;
 
@@ -64,7 +65,8 @@ namespace Elmah.Io
         {
             var headers = new WebHeaderCollection { { HttpRequestHeader.ContentType, "application/x-www-form-urlencoded" } };
             var xml = ErrorXml.EncodeString(error);
-            return _webClient.Post(headers, ApiUrl(), "=" + HttpUtility.UrlEncode(xml));
+            return _webClient.Post(headers, ApiUrl(), "=" + HttpUtility.UrlEncode(xml))
+                             .Apmize(asyncCallback, asyncState);
         }
 
         public override string EndLog(IAsyncResult asyncResult)
@@ -79,7 +81,8 @@ namespace Elmah.Io
                              {
                                  dynamic error = JsonConvert.DeserializeObject(t.Result);
                                  return MapErrorLogEntry((string) error.Id, (string) error.ErrorXml);
-                             });
+                             })
+                             .Apmize(asyncCallback, asyncState);
         }
 
         public override ErrorLogEntry EndGetError(IAsyncResult asyncResult)
@@ -99,14 +102,14 @@ namespace Elmah.Io
                 { "pageindex", pageIndex.ToInvariantString() }, 
                 { "pagesize", pageSize.ToInvariantString() }, 
             });
-            
-            return _webClient.Get(url).ContinueWith(t =>
+
+            var task = _webClient.Get(url).ContinueWith(t =>
             {
                 dynamic d = JsonConvert.DeserializeObject(t.Result);
 
                 var entries = from dynamic e in (IEnumerable) d.Errors
-                              select MapErrorLogEntry((string) e.Id, 
-                                                      (string) e.ErrorXml);
+                    select MapErrorLogEntry((string) e.Id,
+                        (string) e.ErrorXml);
 
                 foreach (var entry in entries)
                 {
@@ -115,6 +118,8 @@ namespace Elmah.Io
 
                 return (int) d.Total;
             });
+
+            return task.Apmize(asyncCallback, asyncState);
         }
 
         public override int EndGetErrors(IAsyncResult asyncResult)
