@@ -3,8 +3,10 @@ using System.Collections;
 using System.Collections.Specialized;
 using System.Linq;
 using System.Net;
+using System.Threading.Tasks;
 using System.Web;
 using Mannex;
+using Mannex.Threading.Tasks;
 using Mannex.Web;
 using Newtonsoft.Json;
 
@@ -56,40 +58,78 @@ namespace Elmah.Io
 
         public override string Log(Error error)
         {
+            return EndLog(BeginLog(error, null, null));
+        }
+
+        public override IAsyncResult BeginLog(Error error, AsyncCallback asyncCallback, object asyncState)
+        {
             var headers = new WebHeaderCollection { { HttpRequestHeader.ContentType, "application/x-www-form-urlencoded" } };
             var xml = ErrorXml.EncodeString(error);
-            return _webClient.Post(headers, ApiUrl(), "=" + HttpUtility.UrlEncode(xml));
+            return _webClient.Post(headers, ApiUrl(), "=" + HttpUtility.UrlEncode(xml))
+                             .Apmize(asyncCallback, asyncState);
+        }
+
+        public override string EndLog(IAsyncResult asyncResult)
+        {
+            return EndImpl<string>(asyncResult);
+        }
+
+        public override IAsyncResult BeginGetError(string id, AsyncCallback asyncCallback, object asyncState)
+        {
+            return _webClient.Get(ApiUrl(new NameValueCollection { { "id", id } }))
+                             .ContinueWith(t =>
+                             {
+                                 dynamic error = JsonConvert.DeserializeObject(t.Result);
+                                 return MapErrorLogEntry((string) error.Id, (string) error.ErrorXml);
+                             })
+                             .Apmize(asyncCallback, asyncState);
+        }
+
+        public override ErrorLogEntry EndGetError(IAsyncResult asyncResult)
+        {
+            return EndImpl<ErrorLogEntry>(asyncResult);
         }
 
         public override ErrorLogEntry GetError(string id)
         {
-            var response = _webClient.Get(ApiUrl(new NameValueCollection { { "id", id } }));
-            dynamic error = JsonConvert.DeserializeObject(response);
-            return MapErrorLogEntry((string) error.Id, (string) error.ErrorXml);
+            return EndGetError(BeginGetError(id, null, null));
         }
 
-        public override int GetErrors(int pageIndex, int pageSize, IList errorEntryList)
+        public override IAsyncResult BeginGetErrors(int pageIndex, int pageSize, IList errorEntryList, AsyncCallback asyncCallback, object asyncState)
         {
             var url = ApiUrl(new NameValueCollection
             {
                 { "pageindex", pageIndex.ToInvariantString() }, 
                 { "pagesize", pageSize.ToInvariantString() }, 
             });
-            
-            var response = _webClient.Get(url);
 
-            dynamic d = JsonConvert.DeserializeObject(response);
-
-            var entries = from dynamic e in (IEnumerable) d.Errors
-                          select MapErrorLogEntry((string) e.Id, 
-                                                  (string) e.ErrorXml);
-
-            foreach (var entry in entries)
+            var task = _webClient.Get(url).ContinueWith(t =>
             {
-                errorEntryList.Add(entry);
-            }
+                dynamic d = JsonConvert.DeserializeObject(t.Result);
 
-            return d.Total;
+                var entries = from dynamic e in (IEnumerable) d.Errors
+                    select MapErrorLogEntry((string) e.Id,
+                        (string) e.ErrorXml);
+
+                foreach (var entry in entries)
+                {
+                    errorEntryList.Add(entry);
+                }
+
+                return (int) d.Total;
+            });
+
+            return task.Apmize(asyncCallback, asyncState);
+        }
+
+        public override int EndGetErrors(IAsyncResult asyncResult)
+        {
+            return EndImpl<int>(asyncResult);
+        }
+
+        public override int GetErrors(int pageIndex, int pageSize, IList errorEntryList)
+        {
+            return EndGetErrors(BeginGetErrors(pageIndex, pageSize, errorEntryList, null, null));
         }
 
         private ErrorLogEntry MapErrorLogEntry(string id, string xml)
@@ -105,6 +145,14 @@ namespace Elmah.Io
                 query ?? new NameValueCollection()
             };
             return new Uri(_url, "api/logs2" + q.ToQueryString());
+        }
+
+        static T EndImpl<T>(IAsyncResult asyncResult)
+        {
+            if (asyncResult == null) throw new ArgumentNullException("asyncResult");
+            var task = asyncResult as Task<T>;
+            if (task == null) throw new ArgumentException(null, "asyncResult");
+            return task.Result;
         }
     }
 }
