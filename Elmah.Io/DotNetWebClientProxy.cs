@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Net;
 using System.Net.Mime;
 using System.Text;
@@ -29,24 +30,22 @@ namespace Elmah.Io
                 // and therefore must be treated specially and go over 
                 // the corresponding property on the HttpWebRequest object.
 
-                var headerz = new WebHeaderCollection {headers};
-                var contentType = headerz[HttpRequestHeader.ContentType];
+                headers = new WebHeaderCollection { headers };
+                var contentType = headers[HttpRequestHeader.ContentType];
                 if (contentType != null)
                 {
                     request.ContentType = contentType;
-                    headerz.Remove(HttpRequestHeader.ContentType);
+                    headers.Remove(HttpRequestHeader.ContentType);
                 }
 
-                request.Headers.Add(headerz);
+                request.Headers.Add(headers);
             }
 
             var encoding = Encoding.UTF8; // TODO parameterize?
             var bytes = encoding.GetBytes(data);
             request.ContentLength = bytes.Length;
 
-            var tcs = new TaskCompletionSource<T>();
-            Spawn(Post(request, bytes, tcs, resultor), tcs);
-            return tcs.Task;
+            return Spawn<T>(tcs => Post(request, bytes, tcs, resultor));
         }
 
         static IEnumerable<Task> Post<T>(WebRequest request, byte[] bytes, TaskCompletionSource<T> tcs, Func<WebHeaderCollection, string, T> resultor)
@@ -65,7 +64,7 @@ namespace Elmah.Io
                 yield return writeTask;
             }
 
-            foreach (var task in Get(request, tcs, resultor))
+            foreach (var task in GetResponse(request, tcs, resultor))
                 yield return task;
         }
 
@@ -79,12 +78,10 @@ namespace Elmah.Io
             if (headers != null)
                 request.Headers.Add(headers);
 
-            var tcs = new TaskCompletionSource<T>();
-            Spawn(Get(request, tcs, resultor), tcs);            
-            return tcs.Task;
+            return Spawn<T>(tcs => GetResponse(request, tcs, resultor));            
         }
 
-        static IEnumerable<Task> Get<T>(WebRequest request, TaskCompletionSource<T> tcs, Func<WebHeaderCollection, string, T> resultor)
+        static IEnumerable<Task> GetResponse<T>(WebRequest request, TaskCompletionSource<T> tcs, Func<WebHeaderCollection, string, T> resultor)
         {
             Debug.Assert(request != null);
             Debug.Assert(tcs != null);
@@ -98,38 +95,49 @@ namespace Elmah.Io
             {
                 var contentType = response.Headers.Map(HttpResponseHeader.ContentType, h => new ContentType(h));
                 var encoding = contentType != null
-                    ? contentType.EncodingFromCharSet(Encoding.Default)
-                    : Encoding.Default;
+                             ? contentType.EncodingFromCharSet(Encoding.Default)
+                             : Encoding.Default;
 
-                var bytes = new byte[4096];
-                var chars = (char[]) null;
-                var decoder = encoding.GetDecoder();
                 var sb = new StringBuilder();
-                while (true)
-                {
-                    var readTask = stream.ReadAsync(bytes, 0, bytes.Length);
-                    yield return readTask;
-                    var readCount = readTask.Result;
-                    if (readCount == 0)
-                        break;
-                    var charCount = decoder.GetCharCount(bytes, 0, readCount);
-                    if (chars == null || charCount > chars.Length)
-                        chars = new char[charCount];
-                    var decodedCharCount = decoder.GetChars(bytes, 0, readCount, chars, 0, false);
-                    sb.Append(chars, 0, decodedCharCount);
-                }
+                foreach (var task in ReadAllText(stream, encoding, sb)) 
+                    yield return task;
 
                 tcs.SetResult(resultor(response.Headers, sb.ToString()));
             }
         }
 
-        static void Spawn<T>(IEnumerable<Task> job, TaskCompletionSource<T> tcs)
+        static IEnumerable<Task> ReadAllText(Stream stream, Encoding encoding, StringBuilder output)
         {
-            Debug.Assert(job != null);
-            Debug.Assert(tcs != null);
+            Debug.Assert(stream != null);
+            Debug.Assert(encoding != null);
+            Debug.Assert(output != null);
 
+            var bytes = new byte[4096];
+            var chars = (char[]) null;
+            var decoder = encoding.GetDecoder();
+            while (true)
+            {
+                var readTask = stream.ReadAsync(bytes, 0, bytes.Length);
+                yield return readTask;
+                var readCount = readTask.Result;
+                if (readCount == 0)
+                    break;
+                var charCount = decoder.GetCharCount(bytes, 0, readCount);
+                if (chars == null || charCount > chars.Length)
+                    chars = new char[charCount];
+                var decodedCharCount = decoder.GetChars(bytes, 0, readCount, chars, 0, false);
+                output.Append(chars, 0, decodedCharCount);
+            }
+        }
+
+        static Task<T> Spawn<T>(Func<TaskCompletionSource<T>, IEnumerable<Task>> jobFunc)
+        {
+            Debug.Assert(jobFunc != null);
+
+            var tcs = new TaskCompletionSource<T>();
+            
             Task.Factory
-                .StartNew(job)
+                .StartNew(jobFunc(tcs))
                 .ContinueWith(t =>
                 {
                     if (t.IsCanceled)
@@ -148,6 +156,8 @@ namespace Elmah.Io
                     }
                 },
                 TaskContinuationOptions.ExecuteSynchronously);
+
+            return tcs.Task;
         }
     }
 }
