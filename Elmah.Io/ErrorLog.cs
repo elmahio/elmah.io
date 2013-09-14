@@ -12,11 +12,17 @@ using Newtonsoft.Json;
 
 namespace Elmah.Io
 {
-    public class ErrorLog : Elmah.ErrorLog
+    public class ErrorLog : Elmah.ErrorLog, IErrorLog
     {
         private readonly string _logId;
         private readonly Uri _url = new Uri("http://elmahio.azurewebsites.net/");
         private readonly IWebClient _webClient;
+
+        public ErrorLog(Guid logId)
+        {
+            _logId = logId.ToString();
+            _webClient = new DotNetWebClientProxy();
+        }
 
         public ErrorLog(IDictionary config) : this(config, new DotNetWebClientProxy())
         {

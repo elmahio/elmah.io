@@ -54,6 +54,7 @@
     <Compile Include="AsyncExtensions.cs" />
     <Compile Include="DotNetWebClientProxy.cs" />
     <Compile Include="ErrorLog.cs" />
+    <Compile Include="IErrorLog.cs" />
     <Compile Include="IWebClient.cs" />
     <Compile Include="IWebClientExtensions.cs" />
     <Compile Include="Mannex\Int32.cs" />
