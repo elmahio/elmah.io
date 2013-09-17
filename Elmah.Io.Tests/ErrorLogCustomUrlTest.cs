@@ -54,7 +54,7 @@ namespace Elmah.Io.Tests
             errorLog.Log(new Error(new System.ApplicationException()));
 
             // Assert
-            Assert.That(actualUri.ToString(), Is.StringStarting("http://elmahio.azurewebsites.net/"));
+            Assert.That(actualUri.ToString(), Is.StringStarting("https://elmahio.azurewebsites.net/"));
         }
     }
 }
