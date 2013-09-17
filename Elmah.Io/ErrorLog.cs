@@ -9,6 +9,7 @@ using Mannex;
 using Mannex.Threading.Tasks;
 using Mannex.Web;
 using Newtonsoft.Json;
+using System.Configuration;
 
 namespace Elmah.Io
 {
@@ -35,18 +36,38 @@ namespace Elmah.Io
                 throw new ArgumentNullException("config");
             }
 
-            if (!config.Contains("LogId"))
+            if (!config.Contains("LogId") && !config.Contains("LogIdKey"))
             {
-                throw new ApplicationException("Missing LogId. Please specify a LogId in your web.config like this: <errorLog type=\"Elmah.Io.ErrorLog, Elmah.Io\" LogId=\"98895825-2516-43DE-B514-FFB39EA89A65\" />");
+                throw new ApplicationException("Missing LogId or LogIdKey. Please specify a LogId in your web.config like this: <errorLog type=\"Elmah.Io.ErrorLog, Elmah.Io\" LogId=\"98895825-2516-43DE-B514-FFB39EA89A65\" /> or using AppSettings: <errorLog type=\"Elmah.Io.ErrorLog, Elmah.Io\" LogIdKey=\"MyAppSettingsKey\" /> where MyAppSettingsKey points to a AppSettings with the key 'MyAPpSettingsKey' and value equal LogId.");
             }
 
-            Guid result;
-            if (!Guid.TryParse(config["LogId"].ToString(), out result))
+            if (config.Contains("LogId"))
             {
-                throw new ApplicationException("Invalid LogId. Please specify a valid LogId in your web.config like this: <errorLog type=\"Elmah.Io.ErrorLog, Elmah.Io\" LogId=\"98895825-2516-43DE-B514-FFB39EA89A65\" />");
-            }
+                Guid result;
+                if (!Guid.TryParse(config["LogId"].ToString(), out result))
+                {
+                    throw new ApplicationException("Invalid LogId. Please specify a valid LogId in your web.config like this: <errorLog type=\"Elmah.Io.ErrorLog, Elmah.Io\" LogId=\"98895825-2516-43DE-B514-FFB39EA89A65\" />");
+                }
 
-            _logId = result.ToString();
+                _logId = result.ToString();
+            }
+            else
+            {
+                var appSettingsKey = config["LogIdKey"].ToString();
+                var value = ConfigurationManager.AppSettings.Get(appSettingsKey);
+                if (value == null)
+                {
+                    throw new ApplicationException("You are trying to reference a AppSetting which is not found (key = '" + appSettingsKey + "'");
+                }
+
+                Guid result;
+                if (!Guid.TryParse(value, out result))
+                {
+                    throw new ApplicationException("Invalid LogId. Please specify a valid LogId in your web.config like this: <appSettings><add key=\"" + appSettingsKey + "\" value=\"98895825-2516-43DE-B514-FFB39EA89A65\" />");
+                }
+
+                _logId = result.ToString();
+            }
 
             if (config.Contains("Url"))
             {
