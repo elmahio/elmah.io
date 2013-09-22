@@ -42,7 +42,7 @@ namespace Elmah.Io.Tests
 
             Assert.That(result, Is.EqualTo(id));
             Assert.That(requestHeaders[HttpRequestHeader.ContentType], Is.EqualTo("application/x-www-form-urlencoded"));
-            Assert.That(actualUri.AbsoluteUri, Is.Not.Null.And.StringEnding(string.Format("api/logs2?logId={0}", logId)));
+            Assert.That(actualUri.AbsoluteUri, Is.Not.Null.And.StringEnding(string.Format("api/errors?logId={0}", logId)));
             Assert.That(actualData, Is.Not.Null.And.StringStarting("=").And.StringContaining("ApplicationException"));
         }
 
@@ -65,7 +65,7 @@ namespace Elmah.Io.Tests
             var result = errorLog.GetError(id);
 
             Assert.That(result, Is.Not.Null);
-            Assert.That(actualUri.AbsoluteUri, Is.Not.Null.And.StringEnding(string.Format("api/logs2?logId={1}&id={0}", id, logId)));
+            Assert.That(actualUri.AbsoluteUri, Is.Not.Null.And.StringEnding(string.Format("api/errors?logId={1}&id={0}", id, logId)));
             Assert.That(result, Is.Not.Null);
             Assert.That(result.Error, Is.Not.Null);
             Assert.That(result.Error.Type, Is.EqualTo("System.ApplicationException"));
@@ -99,7 +99,7 @@ namespace Elmah.Io.Tests
             var results = new ArrayList();
             var count = errorLog.GetErrors(pageIndex, pageSize, results);
 
-            Assert.That(actualUri.AbsoluteUri, Is.Not.Null.And.StringEnding(string.Format("api/logs2?logId={0}&pageindex={1}&pagesize={2}", logId, pageIndex, pageSize)));
+            Assert.That(actualUri.AbsoluteUri, Is.Not.Null.And.StringEnding(string.Format("api/errors?logId={0}&pageindex={1}&pagesize={2}", logId, pageIndex, pageSize)));
             Assert.That(count, Is.EqualTo(3));
             Assert.That(results, Is.Not.Null);
             Assert.That(results.Count, Is.EqualTo(3));

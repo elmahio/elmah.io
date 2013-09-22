@@ -171,7 +171,7 @@ namespace Elmah.Io
                 { "logId", _logId }, 
                 query ?? new NameValueCollection()
             };
-            return new Uri(_url, "api/logs2" + q.ToQueryString());
+            return new Uri(_url, "api/errors" + q.ToQueryString());
         }
 
         static T EndImpl<T>(IAsyncResult asyncResult)
