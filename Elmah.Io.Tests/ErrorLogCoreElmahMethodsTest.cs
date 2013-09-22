@@ -25,6 +25,7 @@ namespace Elmah.Io.Tests
         public void CanLogError()
         {
             var id = _fixture.Create<int>().ToString(CultureInfo.InvariantCulture);
+            var error = new { Id = id };
             var logId = _fixture.Create<Guid>().ToString();
             Uri actualUri = null;
             string actualData = null;
@@ -34,7 +35,7 @@ namespace Elmah.Io.Tests
             webClientMock
                 .Setup(x => x.Post(It.IsAny<WebHeaderCollection>(), It.IsAny<Uri>(), It.IsAny<string>(), It.IsAny<Func<WebHeaderCollection, string, string>>()))
                 .Callback<WebHeaderCollection, Uri, string, Func<WebHeaderCollection, string, string>>((headers, uri, data, resultor) => { requestHeaders = headers; actualUri = uri; actualData = data; })
-                .Returns(Task.FromResult(id));
+                .Returns(Task.FromResult(JsonConvert.SerializeObject(error)));
 
             var errorLog = new ErrorLog(new Hashtable { { "LogId", logId } }, webClientMock.Object);
 

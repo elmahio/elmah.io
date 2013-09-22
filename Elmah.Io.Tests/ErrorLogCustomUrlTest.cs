@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Moq;
 using NUnit.Framework;
 using Ploeh.AutoFixture;
+using Newtonsoft.Json;
 
 namespace Elmah.Io.Tests
 {
@@ -28,7 +29,7 @@ namespace Elmah.Io.Tests
             webClientMock
                 .Setup(x => x.Post(It.IsAny<WebHeaderCollection>(), It.IsAny<Uri>(), It.IsAny<string>(), It.IsAny<Func<WebHeaderCollection, string, string>>()))
                 .Callback<WebHeaderCollection, Uri, string, Func<WebHeaderCollection, string, string>>((headers, uri, data, resultor) => { actualUri = uri; })
-                .Returns(Task.FromResult<string>(null));
+                .Returns(Task.FromResult(JsonConvert.SerializeObject(new { Id = _fixture.Create<string>() })));
             var errorLog = new ErrorLog(new Hashtable { {"LogId", _fixture.Create<Guid>().ToString()}, {"Url", configUri} }, webClientMock.Object);
 
             // Act
@@ -47,7 +48,7 @@ namespace Elmah.Io.Tests
             webClientMock
                 .Setup(x => x.Post(It.IsAny<WebHeaderCollection>(), It.IsAny<Uri>(), It.IsAny<string>(), It.IsAny<Func<WebHeaderCollection, string, string>>()))
                 .Callback<WebHeaderCollection, Uri, string, Func<WebHeaderCollection, string, string>>((headers, uri, data, resultor) => { actualUri = uri; })
-                .Returns(Task.FromResult<string>(null));
+                .Returns(Task.FromResult(JsonConvert.SerializeObject(new { Id = _fixture.Create<string>() })));
             var errorLog = new ErrorLog(new Hashtable { { "LogId", _fixture.Create<Guid>().ToString() } }, webClientMock.Object);
 
             // Act

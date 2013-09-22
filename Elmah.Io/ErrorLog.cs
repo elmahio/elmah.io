@@ -92,7 +92,13 @@ namespace Elmah.Io
         {
             var headers = new WebHeaderCollection { { HttpRequestHeader.ContentType, "application/x-www-form-urlencoded" } };
             var xml = ErrorXml.EncodeString(error);
+
             return _webClient.Post(headers, ApiUrl(), "=" + HttpUtility.UrlEncode(xml))
+                             .ContinueWith(t =>
+                             {
+                                 dynamic d = JsonConvert.DeserializeObject(t.Result);
+                                 return (string)d.Id;
+                             })
                              .Apmize(asyncCallback, asyncState);
         }
 
