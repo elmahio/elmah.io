@@ -16,5 +16,7 @@
   </metadata>
   <files>
     <file src="bin\$Configuration$\Elmah.Io.dll" target="lib\net40\Elmah.Io.dll" />
+    <file src="NuGet\content\web.config.transform" target="content\web.config.transform" />
+    <file src="NuGet\tools\install.ps1" target="tools\install.ps1" />
   </files>
 </package>
