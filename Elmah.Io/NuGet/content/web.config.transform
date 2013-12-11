@@ -23,7 +23,6 @@
     </modules>
   </system.webServer>
   <elmah>
-    <errorLog type="Elmah.Io.ErrorLog, Elmah.Io" LogId="ELMAH_IO_LOG_ID" />
     <security allowRemoteAccess="false" />
   </elmah>
   <location path="elmah.axd" inheritInChildApplications="false">
