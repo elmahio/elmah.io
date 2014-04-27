@@ -16,7 +16,7 @@ namespace Elmah.Io
     public class ErrorLog : Elmah.ErrorLog, IErrorLog
     {
         private readonly string _logId;
-        private readonly Uri _url = new Uri("https://elmahio.azurewebsites.net/");
+        private readonly Uri _url = new Uri("https://elmah.io/");
         private readonly IWebClient _webClient;
 
         public ErrorLog(Guid logId)
