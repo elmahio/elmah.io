@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Net;
 using System.Net.Mime;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using Mannex.Net;
@@ -14,6 +15,28 @@ namespace Elmah.Io
 {
     internal class DotNetWebClientProxy : IWebClient
     {
+        private string _userAgent;
+
+        private string UserAgent
+        {
+            get
+            {
+                if (string.IsNullOrWhiteSpace(_userAgent))
+                {
+                    try
+                    {
+                        _userAgent = string.Format("elmah.io client/{0}",
+                            Assembly.GetExecutingAssembly().GetName().Version);
+                    }
+                    catch
+                    {
+                    }
+                }
+
+                return _userAgent;
+            }
+        }
+
         public Task<T> Post<T>(WebHeaderCollection headers, Uri address, string data,
             Func<WebHeaderCollection, string, T> resultor)
         {
@@ -23,6 +46,7 @@ namespace Elmah.Io
 
             var request = (HttpWebRequest) WebRequest.Create(address);
             request.Method = "POST";
+            request.UserAgent = UserAgent;
 
             if (headers != null)
             {
@@ -74,6 +98,7 @@ namespace Elmah.Io
             if (resultor == null) throw new ArgumentNullException("resultor");
 
             var request = (HttpWebRequest) WebRequest.Create(address);
+            request.UserAgent = UserAgent;
             
             if (headers != null)
                 request.Headers.Add(headers);

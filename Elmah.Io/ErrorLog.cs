@@ -29,6 +29,11 @@ namespace Elmah.Io
         {
         }
 
+        /// <summary>
+        /// ELMAH doesn't use this constructor and it is only published in order for you to create
+        /// a new error logger using a custom implementation of IWebClient. If you do so, please
+        /// identify yourself using an appropriate user agent.
+        /// </summary>
         public ErrorLog(IDictionary config, IWebClient webClient)
         {
             if (config == null)
