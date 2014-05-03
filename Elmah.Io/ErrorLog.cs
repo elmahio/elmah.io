@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Specialized;
+using System.Configuration;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
@@ -9,7 +10,6 @@ using Mannex;
 using Mannex.Threading.Tasks;
 using Mannex.Web;
 using Newtonsoft.Json;
-using System.Configuration;
 
 namespace Elmah.Io
 {
