@@ -65,6 +65,11 @@ namespace Elmah.Io
             return _webClient.Post(headers, ApiUrl(), "=" + HttpUtility.UrlEncode(xml))
                              .ContinueWith(t =>
                              {
+                                 if (t.Status != TaskStatus.RanToCompletion)
+                                 {
+                                     return null;
+                                 }
+
                                  dynamic d = JsonConvert.DeserializeObject(t.Result);
                                  return (string)d.Id;
                              })
@@ -81,6 +86,11 @@ namespace Elmah.Io
             return _webClient.Get(ApiUrl(new NameValueCollection { { "id", id } }))
                              .ContinueWith(t =>
                              {
+                                 if (t.Status != TaskStatus.RanToCompletion)
+                                 {
+                                     return null;
+                                 }
+                             
                                  dynamic error = JsonConvert.DeserializeObject(t.Result);
                                  return MapErrorLogEntry((string) error.Id, (string) error.ErrorXml);
                              })
@@ -107,6 +117,11 @@ namespace Elmah.Io
 
             var task = _webClient.Get(url).ContinueWith(t =>
             {
+                if (t.Status != TaskStatus.RanToCompletion)
+                {
+                    return 0;
+                }
+
                 dynamic d = JsonConvert.DeserializeObject(t.Result);
 
                 var entries = from dynamic e in (IEnumerable) d.Errors
