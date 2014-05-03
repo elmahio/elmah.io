@@ -92,7 +92,7 @@ namespace Elmah.Io
                                  }
                              
                                  dynamic error = JsonConvert.DeserializeObject(t.Result);
-                                 return MapErrorLogEntry((string) error.Id, (string) error.ErrorXml);
+                                 return MapErrorLogEntry((string)error.Id, (string)error.ErrorXml);
                              })
                              .Apmize(asyncCallback, asyncState);
         }
@@ -124,16 +124,16 @@ namespace Elmah.Io
 
                 dynamic d = JsonConvert.DeserializeObject(t.Result);
 
-                var entries = from dynamic e in (IEnumerable) d.Errors
-                    select MapErrorLogEntry((string) e.Id,
-                        (string) e.ErrorXml);
+                var entries = 
+                    from dynamic e in (IEnumerable)d.Errors
+                    select MapErrorLogEntry((string)e.Id, (string)e.ErrorXml);
 
                 foreach (var entry in entries)
                 {
                     errorEntryList.Add(entry);
                 }
 
-                return (int) d.Total;
+                return (int)d.Total;
             });
 
             return task.Apmize(asyncCallback, asyncState);
@@ -154,7 +154,7 @@ namespace Elmah.Io
             return new ErrorLogEntry(this, id, ErrorXml.DecodeString(xml));
         }
 
-        Uri ApiUrl(NameValueCollection query = null)
+        private Uri ApiUrl(NameValueCollection query = null)
         {
             var q = new NameValueCollection
             {
