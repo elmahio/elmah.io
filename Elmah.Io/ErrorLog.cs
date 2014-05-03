@@ -36,7 +36,7 @@ namespace Elmah.Io
         /// </summary>
         public ErrorLog(IDictionary config, IWebClient webClient)
         {
-            if (config == null)
+            if (config == null) 
             {
                 throw new ArgumentNullException("config");
             }
@@ -46,44 +46,8 @@ namespace Elmah.Io
                 throw new ApplicationException("Missing LogId or LogIdKey. Please specify a LogId in your web.config like this: <errorLog type=\"Elmah.Io.ErrorLog, Elmah.Io\" LogId=\"98895825-2516-43DE-B514-FFB39EA89A65\" /> or using AppSettings: <errorLog type=\"Elmah.Io.ErrorLog, Elmah.Io\" LogIdKey=\"MyAppSettingsKey\" /> where MyAppSettingsKey points to a AppSettings with the key 'MyAPpSettingsKey' and value equal LogId.");
             }
 
-            if (config.Contains("LogId"))
-            {
-                Guid result;
-                if (!Guid.TryParse(config["LogId"].ToString(), out result))
-                {
-                    throw new ApplicationException("Invalid LogId. Please specify a valid LogId in your web.config like this: <errorLog type=\"Elmah.Io.ErrorLog, Elmah.Io\" LogId=\"98895825-2516-43DE-B514-FFB39EA89A65\" />");
-                }
-
-                _logId = result.ToString();
-            }
-            else
-            {
-                var appSettingsKey = config["LogIdKey"].ToString();
-                var value = ConfigurationManager.AppSettings.Get(appSettingsKey);
-                if (value == null)
-                {
-                    throw new ApplicationException("You are trying to reference a AppSetting which is not found (key = '" + appSettingsKey + "'");
-                }
-
-                Guid result;
-                if (!Guid.TryParse(value, out result))
-                {
-                    throw new ApplicationException("Invalid LogId. Please specify a valid LogId in your web.config like this: <appSettings><add key=\"" + appSettingsKey + "\" value=\"98895825-2516-43DE-B514-FFB39EA89A65\" />");
-                }
-
-                _logId = result.ToString();
-            }
-
-            if (config.Contains("Url"))
-            {
-                Uri uri;
-                if (!Uri.TryCreate(config["Url"].ToString(), UriKind.Absolute, out uri))
-                {
-                    throw new ApplicationException("Invalid URL. Please specify a valid absolute url. In fact you don't even need to specify an url, which will make the error logger use the elmah.io backend.");
-                }
-
-                _url = new Uri(config["Url"].ToString());
-            }
+            _logId = ResolveLogId(config);
+            _url = ResolveUrl(config);
 
             _webClient = webClient;
         }
@@ -185,12 +149,72 @@ namespace Elmah.Io
             return new Uri(_url, "api/errors" + q.ToQueryString());
         }
 
-        static T EndImpl<T>(IAsyncResult asyncResult)
+        private T EndImpl<T>(IAsyncResult asyncResult)
         {
-            if (asyncResult == null) throw new ArgumentNullException("asyncResult");
+            if (asyncResult == null)
+            {
+                throw new ArgumentNullException("asyncResult");
+            }
+
             var task = asyncResult as Task<T>;
-            if (task == null) throw new ArgumentException(null, "asyncResult");
+            if (task == null)
+            {
+                throw new ArgumentException(null, "asyncResult");
+            }
+
             return task.Result;
+        }
+
+        private Uri ResolveUrl(IDictionary config)
+        {
+            if (!config.Contains("Url"))
+            {
+                return _url;
+            }
+
+            Uri uri;
+            if (!Uri.TryCreate(config["Url"].ToString(), UriKind.Absolute, out uri))
+            {
+                throw new ApplicationException(
+                    "Invalid URL. Please specify a valid absolute url. In fact you don't even need to specify an url, which will make the error logger use the elmah.io backend.");
+            }
+
+            return new Uri(config["Url"].ToString());
+        }
+
+        private string ResolveLogId(IDictionary config)
+        {
+            if (config.Contains("LogId"))
+            {
+                Guid result;
+                if (!Guid.TryParse(config["LogId"].ToString(), out result))
+                {
+                    throw new ApplicationException(
+                        "Invalid LogId. Please specify a valid LogId in your web.config like this: <errorLog type=\"Elmah.Io.ErrorLog, Elmah.Io\" LogId=\"98895825-2516-43DE-B514-FFB39EA89A65\" />");
+                }
+
+                return result.ToString();
+            }
+            else
+            {
+                var appSettingsKey = config["LogIdKey"].ToString();
+                var value = ConfigurationManager.AppSettings.Get(appSettingsKey);
+                if (value == null)
+                {
+                    throw new ApplicationException(
+                        "You are trying to reference a AppSetting which is not found (key = '" + appSettingsKey + "'");
+                }
+
+                Guid result;
+                if (!Guid.TryParse(value, out result))
+                {
+                    throw new ApplicationException(
+                        "Invalid LogId. Please specify a valid LogId in your web.config like this: <appSettings><add key=\""
+                        + appSettingsKey + "\" value=\"98895825-2516-43DE-B514-FFB39EA89A65\" />");
+                }
+
+                return result.ToString();
+            }
         }
     }
 }
