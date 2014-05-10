@@ -46,6 +46,7 @@ namespace Elmah.Io
 
             var request = (HttpWebRequest) WebRequest.Create(address);
             request.Method = "POST";
+            request.Timeout = 5000;
             request.UserAgent = UserAgent;
 
             if (headers != null)
