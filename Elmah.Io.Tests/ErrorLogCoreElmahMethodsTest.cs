@@ -3,6 +3,7 @@ using System.Collections;
 using System.Globalization;
 using System.Net;
 using System.Threading.Tasks;
+using System.Web;
 using Moq;
 using Newtonsoft.Json;
 using NUnit.Framework;
@@ -45,6 +46,45 @@ namespace Elmah.Io.Tests
             Assert.That(requestHeaders[HttpRequestHeader.ContentType], Is.EqualTo("application/x-www-form-urlencoded"));
             Assert.That(actualUri.AbsoluteUri, Is.Not.Null.And.StringEnding(string.Format("api/errors?logId={0}", logId)));
             Assert.That(actualData, Is.Not.Null.And.StringStarting("=").And.StringContaining("ApplicationException"));
+        }
+
+        [Test]
+        public void CanLogStackTrace()
+        {
+            Error loggedError = null;
+            var id = _fixture.Create<int>().ToString(CultureInfo.InvariantCulture);
+            var error = new { Id = id };
+            var logId = _fixture.Create<Guid>().ToString();
+            var webClientMock = new Mock<IWebClient>();
+            webClientMock
+                .Setup(
+                    x =>
+                        x.Post(It.IsAny<WebHeaderCollection>(), It.IsAny<Uri>(), It.IsAny<string>(),
+                            It.IsAny<Func<WebHeaderCollection, string, string>>()))
+                .Callback<WebHeaderCollection, Uri, string, Func<WebHeaderCollection, string, string>>((headers, uri, data, callback) =>
+                {
+                    var xml = HttpUtility.UrlDecode(data).TrimStart(new[] { '=' });
+                    loggedError = Elmah.ErrorXml.DecodeString(xml);
+                })
+                .Returns(Task.FromResult(JsonConvert.SerializeObject(error)));
+            var errorLog = new ErrorLog(new Hashtable { { "LogId", logId } }, webClientMock.Object);
+
+            try
+            {
+                throw new System.ApplicationException();
+            }
+            catch (System.ApplicationException e)
+            {
+                errorLog.Log(new Error(e));
+            }
+
+            Assert.That(loggedError != null);
+            Assert.That(loggedError.ServerVariables != null);
+            var stackTrace = loggedError.ServerVariables["X-ELMAHIO-STACKTRACE"];
+            Assert.That(!string.IsNullOrWhiteSpace(stackTrace));
+            var stackTraceObject = JsonConvert.DeserializeObject<dynamic>(stackTrace);
+            dynamic first = stackTraceObject[0];
+            Assert.That(!string.IsNullOrWhiteSpace((string)first.type));
         }
 
         [Test]

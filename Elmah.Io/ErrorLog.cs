@@ -60,6 +60,7 @@ namespace Elmah.Io
         public override IAsyncResult BeginLog(Error error, AsyncCallback asyncCallback, object asyncState)
         {
             var headers = new WebHeaderCollection { { HttpRequestHeader.ContentType, "application/x-www-form-urlencoded" } };
+            DecorateErrorWithStackTraceIfPossible(error);
             var xml = ErrorXml.EncodeString(error);
 
             return _webClient.Post(headers, ApiUrl(), "=" + HttpUtility.UrlEncode(xml))
@@ -230,6 +231,34 @@ namespace Elmah.Io
 
                 return result.ToString();
             }
+        }
+
+        private void DecorateErrorWithStackTraceIfPossible(Error error)
+        {
+            try
+            {
+                const string headerName = "X-ELMAHIO-STACKTRACE";
+                if (error.HasServerVariable(headerName)) return;
+
+                var stackTrace = error.StackTraceOrNull();
+                if (stackTrace == null) return;
+
+                var firstFrame = stackTrace.GetFrame(0);
+                var method = firstFrame.GetMethod();
+                var type = method.DeclaringType;
+
+                var details = new
+                {
+                    @namespace = type != null ? type.Namespace : null,
+                    type = type != null ? type.Name : null,
+                    method = method.Name,
+                    line = firstFrame.GetFileLineNumber(),
+                    column = firstFrame.GetFileColumnNumber(),
+                };
+
+                error.ServerVariables.Add(headerName, JsonConvert.SerializeObject(new[] {details}));
+            }
+            catch {}
         }
     }
 }

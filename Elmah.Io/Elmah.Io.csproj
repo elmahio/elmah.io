@@ -53,6 +53,7 @@
   <ItemGroup>
     <Compile Include="AsyncExtensions.cs" />
     <Compile Include="DotNetWebClientProxy.cs" />
+    <Compile Include="ErrorExtensions.cs" />
     <Compile Include="ErrorLog.cs" />
     <Compile Include="IErrorLog.cs" />
     <Compile Include="IWebClient.cs" />
