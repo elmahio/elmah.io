@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Configuration;
 using System.Linq;
@@ -243,20 +244,26 @@ namespace Elmah.Io
                 var stackTrace = error.StackTraceOrNull();
                 if (stackTrace == null) return;
 
-                var firstFrame = stackTrace.GetFrame(0);
-                var method = firstFrame.GetMethod();
-                var type = method.DeclaringType;
-
-                var details = new
+                var frames = new List<object>();
+                foreach (var frame in stackTrace.GetFrames())
                 {
-                    @namespace = type != null ? type.Namespace : null,
-                    type = type != null ? type.Name : null,
-                    method = method.Name,
-                    line = firstFrame.GetFileLineNumber(),
-                    column = firstFrame.GetFileColumnNumber(),
-                };
+                    var method = frame.GetMethod();
+                    var type = method.DeclaringType;
 
-                error.ServerVariables.Add(headerName, JsonConvert.SerializeObject(new[] {details}));
+                    var details = new
+                    {
+                        assembly = type != null ? type.Assembly.GetName().Name : null,
+                        @namespace = type != null ? type.Namespace : null,
+                        type = type != null ? type.Name : null,
+                        method = method.Name,
+                        line = frame.GetFileLineNumber(),
+                        column = frame.GetFileColumnNumber(),
+                    };
+
+                    frames.Add(details);
+                }
+
+                error.ServerVariables.Add(headerName, JsonConvert.SerializeObject(frames.ToArray()));
             }
             catch {}
         }
