@@ -1,12 +1,14 @@
 ﻿using System;
 using System.Collections;
-using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Configuration;
+using System.IO;
 using System.Linq;
 using System.Net;
+using System.Reflection;
 using System.Threading.Tasks;
 using System.Web;
+using System.Web.Hosting;
 using Mannex;
 using Mannex.Threading.Tasks;
 using Mannex.Web;
@@ -16,6 +18,7 @@ namespace Elmah.Io
 {
     public class ErrorLog : Elmah.ErrorLog, IErrorLog
     {
+        public const string FailedMessagesDirectory = "~/App_Data";
         private readonly string _logId;
         private readonly Uri _url = new Uri("https://elmah.io/");
         private readonly IWebClient _webClient;
@@ -51,6 +54,7 @@ namespace Elmah.Io
             _url = ResolveUrl(config);
 
             _webClient = webClient;
+            HandleFailedMessages();
         }
 
         public override string Log(Error error)
@@ -69,7 +73,8 @@ namespace Elmah.Io
                              {
                                  if (t.Status != TaskStatus.RanToCompletion)
                                  {
-                                     return null;
+                                     var xmlFileErrorLog = new XmlFileErrorLog(FailedMessagesDirectory);
+                                     return xmlFileErrorLog.EndLog(xmlFileErrorLog.BeginLog(error, null, null));
                                  }
 
                                  dynamic d = JsonConvert.DeserializeObject(t.Result);
@@ -244,28 +249,53 @@ namespace Elmah.Io
                 var stackTrace = error.StackTraceOrNull();
                 if (stackTrace == null) return;
 
-                var frames = new List<object>();
-                foreach (var frame in stackTrace.GetFrames())
+                var firstFrame = stackTrace.GetFrame(0);
+                var method = firstFrame.GetMethod();
+                var type = method.DeclaringType;
+
+                var details = new
                 {
-                    var method = frame.GetMethod();
-                    var type = method.DeclaringType;
+                    @namespace = type != null ? type.Namespace : null,
+                    type = type != null ? type.Name : null,
+                    method = method.Name,
+                    line = firstFrame.GetFileLineNumber(),
+                    column = firstFrame.GetFileColumnNumber(),
+                };
 
-                    var details = new
-                    {
-                        assembly = type != null ? type.Assembly.GetName().Name : null,
-                        @namespace = type != null ? type.Namespace : null,
-                        type = type != null ? type.Name : null,
-                        method = method.Name,
-                        line = frame.GetFileLineNumber(),
-                        column = frame.GetFileColumnNumber(),
-                    };
-
-                    frames.Add(details);
-                }
-
-                error.ServerVariables.Add(headerName, JsonConvert.SerializeObject(frames.ToArray()));
+                error.ServerVariables.Add(headerName, JsonConvert.SerializeObject(new[] {details}));
             }
             catch {}
+        }
+
+        private void HandleFailedMessages()
+        {
+            var appData = HttpContext.Current != null
+                ? HttpContext.Current.Server.MapPath(FailedMessagesDirectory)
+                : Path.Combine(AssemblyDirectory, FailedMessagesDirectory);
+            if (string.IsNullOrWhiteSpace(appData)) return;
+
+            foreach (var potentialErrorFile in Directory.GetFiles(appData).Where(x => x.Contains("error-") && x.EndsWith(".xml")))
+            {
+                try
+                {
+                    var error = ErrorXml.DecodeString(File.ReadAllText(potentialErrorFile));
+                    if (error == null) continue;
+                    Log(error);
+                    File.Delete(potentialErrorFile);
+                }
+                catch { }
+            }
+        }
+
+        private static string AssemblyDirectory
+        {
+            get
+            {
+                var codeBase = Assembly.GetExecutingAssembly().CodeBase;
+                var uri = new UriBuilder(codeBase);
+                var path = Uri.UnescapeDataString(uri.Path);
+                return Path.GetDirectoryName(path);
+            }
         }
     }
 }
