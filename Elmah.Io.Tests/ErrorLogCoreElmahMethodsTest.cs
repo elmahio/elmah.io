@@ -71,9 +71,9 @@ namespace Elmah.Io.Tests
 
             try
             {
-                throw new System.ApplicationException();
+                string.Empty.Replace(null, null);
             }
-            catch (System.ApplicationException e)
+            catch (ArgumentNullException e)
             {
                 errorLog.Log(new Error(e));
             }
@@ -84,7 +84,9 @@ namespace Elmah.Io.Tests
             Assert.That(!string.IsNullOrWhiteSpace(stackTrace));
             var stackTraceObject = JsonConvert.DeserializeObject<dynamic>(stackTrace);
             dynamic first = stackTraceObject[0];
+            dynamic second = stackTraceObject[1];
             Assert.That(!string.IsNullOrWhiteSpace((string)first.type));
+            Assert.That(!string.IsNullOrWhiteSpace((string)second.type));
         }
 
         [Test]
