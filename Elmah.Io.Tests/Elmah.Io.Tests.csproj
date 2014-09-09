@@ -61,6 +61,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ErrorLogApplicationNameTest.cs" />
     <Compile Include="ErrorLogCoreElmahMethodsTest.cs" />
     <Compile Include="ErrorLogCustomUrlTest.cs" />
     <Compile Include="ErrorLogErrorHandlingTest.cs" />

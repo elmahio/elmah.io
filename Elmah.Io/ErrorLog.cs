@@ -49,6 +49,7 @@ namespace Elmah.Io
 
             _logId = ResolveLogId(config);
             _url = ResolveUrl(config);
+            ApplicationName = ResolveApplicationName(config);
 
             _webClient = webClient;
         }
@@ -180,6 +181,11 @@ namespace Elmah.Io
             }
 
             return task.Result;
+        }
+
+        private string ResolveApplicationName(IDictionary config)
+        {
+            return config.Contains("applicationName") ? config["applicationName"].ToString() : string.Empty;
         }
 
         private Uri ResolveUrl(IDictionary config)
