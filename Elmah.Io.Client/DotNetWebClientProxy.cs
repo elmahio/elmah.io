@@ -11,7 +11,7 @@ using Mannex.Net;
 using Mannex.Net.Mime;
 using Mannex.Threading.Tasks;
 
-namespace Elmah.Io
+namespace Elmah.Io.Client
 {
     internal class DotNetWebClientProxy : IWebClient
     {

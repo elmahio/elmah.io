@@ -9,7 +9,7 @@ namespace Elmah.Io.Tests
         [Test]
         public void AssertThrowsArgumentNullExceptionOnMissingConfig()
         {
-            var exception = Assert.Throws<ArgumentNullException>(() => new ErrorLog(null));
+            var exception = Assert.Throws<ArgumentNullException>(() => new ErrorLog((IDictionary)null));
             Assert.That(exception.ParamName, Is.EqualTo("config"));
         }
 

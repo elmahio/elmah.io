@@ -2,7 +2,7 @@
 using System.Net;
 using System.Threading.Tasks;
 
-namespace Elmah.Io
+namespace Elmah.Io.Client
 {
     public interface IWebClient
     {

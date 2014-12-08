@@ -2,7 +2,7 @@
 using System.Net;
 using System.Threading.Tasks;
 
-namespace Elmah.Io
+namespace Elmah.Io.Client
 {
     static class IWebClientExtensions
     {
@@ -14,7 +14,7 @@ namespace Elmah.Io
         public static Task<string> Post(this IWebClient client, WebHeaderCollection headers, Uri address, string data)
         {
             if (client == null) throw new ArgumentNullException("client");
-            return client.Post(headers, address, data, (_, r) => r);
+            return client.Post(headers, address, data, (responseHeaders, r) => responseHeaders["Location"]);
         }
 
         public static Task<string> Get(this IWebClient client, Uri address)
