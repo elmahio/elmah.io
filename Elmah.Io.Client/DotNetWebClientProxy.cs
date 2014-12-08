@@ -66,7 +66,7 @@ namespace Elmah.Io.Client
                 request.Headers.Add(headers);
             }
 
-            var encoding = Encoding.UTF8; // TODO parameterize?
+            var encoding = Encoding.UTF8;
             var bytes = encoding.GetBytes(data);
             request.ContentLength = bytes.Length;
 
