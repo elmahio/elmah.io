@@ -4,6 +4,7 @@ using System;
 using System.Collections;
 using System.Globalization;
 using System.Net;
+using System.Text;
 using System.Threading.Tasks;
 using Moq;
 using Newtonsoft.Json;
@@ -64,7 +65,7 @@ namespace Elmah.Io.Tests
             webClientMock
                 .Setup(x => x.Get(It.IsAny<WebHeaderCollection>(), It.IsAny<Uri>(), It.IsAny<Func<WebHeaderCollection, string, string>>()))
                 .Callback<WebHeaderCollection, Uri, Func<WebHeaderCollection, string, string>>((headers, uri, resultor) => { actualUri = uri; })
-                .Returns(Task.FromResult(JsonConvert.SerializeObject(message)));
+                .Returns(Task.FromResult("{title: \"" + message.Title + "\"}"));
 
             var logger = new Logger(logId, null, webClientMock.Object);
 
@@ -88,10 +89,11 @@ namespace Elmah.Io.Tests
             Uri actualUri = null;
 
             var webClientMock = new Mock<IWebClient>();
+            var buildJson = BuildJson(messages);
             webClientMock
                 .Setup(x => x.Get(It.IsAny<WebHeaderCollection>(), It.IsAny<Uri>(), It.IsAny<Func<WebHeaderCollection, string, string>>()))
                 .Callback<WebHeaderCollection, Uri, Func<WebHeaderCollection, string, string>>((headers, uri, resultor) => { actualUri = uri; })
-                .Returns(Task.FromResult(JsonConvert.SerializeObject(messages)));
+                .Returns(Task.FromResult(buildJson));
 
             var logger = new Logger(logId, null, webClientMock.Object);
             var results = new ArrayList();
@@ -105,6 +107,21 @@ namespace Elmah.Io.Tests
             Assert.That(result.Messages, Is.Not.Null);
             Assert.That(result.Messages.Count, Is.EqualTo(messages.Messages.Count));
             messages.Messages.ForEach(message => Assert.That(result.Messages.Any(msg => msg.Title == message.Title)));
-        } 
+        }
+
+        private string BuildJson(MessagesResult messages)
+        {
+            var jsonBuilder = new StringBuilder();
+            jsonBuilder.Append("{total: ").Append(messages.Total).Append(", messages: [");
+            var first = true;
+            foreach (var message in messages.Messages)
+            {
+                if (!first) jsonBuilder.Append(",");
+                first = false;
+                jsonBuilder.Append("{title: \"").Append(message.Title).Append("\"}");
+            }
+            jsonBuilder.Append("]}");
+            return jsonBuilder.ToString();
+        }
     }
 }
