@@ -25,7 +25,7 @@ namespace Elmah.Io.Client
         {
         }
 
-        public Logger(Guid logId, Uri url, IWebClient webClient)
+        internal Logger(Guid logId, Uri url, IWebClient webClient)
         {
             _logId = logId;
             if (url != null) _url = url;
