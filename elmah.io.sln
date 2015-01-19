@@ -9,6 +9,13 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Elmah.Io.Tests", "Elmah.Io.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Elmah.Io.Client", "Elmah.Io.Client\Elmah.Io.Client.csproj", "{52B1D9EE-787C-4F42-ACCC-9A46F365CFD5}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{6A54AB67-75DF-4959-A02A-A7CEFE145B3A}"
+	ProjectSection(SolutionItems) = preProject
+		elmah.io.client.nuspec = elmah.io.client.nuspec
+		elmah.io.core.nuspec = elmah.io.core.nuspec
+		elmah.io.nuspec = elmah.io.nuspec
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
