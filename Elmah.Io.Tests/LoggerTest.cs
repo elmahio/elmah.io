@@ -7,7 +7,6 @@ using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using Moq;
-using Newtonsoft.Json;
 using NUnit.Framework;
 using Ploeh.AutoFixture;
 
