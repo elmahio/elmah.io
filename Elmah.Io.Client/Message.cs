@@ -30,7 +30,7 @@ namespace Elmah.Io.Client
 
         public string User { get; set; }
 
-        public Severity Severity { get; set; }
+        public Severity? Severity { get; set; }
 
         public string Url { get; set; }
 
