@@ -108,6 +108,28 @@ namespace Elmah.Io.Tests
             messages.Messages.ForEach(message => Assert.That(result.Messages.Any(msg => msg.Title == message.Title)));
         }
 
+        [Test]
+        public void CanRegisterForMessageEvent()
+        {
+            // Arrange
+            var logId = _fixture.Create<Guid>();
+            var webClientMock = new Mock<IWebClient>();
+            var logger = new Logger(logId, null, webClientMock.Object);
+
+            var eventHandlerWasCalled = false;
+
+            logger.OnMessage += (sender, args) =>
+            {
+                eventHandlerWasCalled = true;
+            };
+
+            // Act
+            logger.Log(_fixture.Create<Message>());
+
+            // Assert
+            Assert.That(eventHandlerWasCalled);
+        }
+
         private string BuildJson(MessagesResult messages)
         {
             var jsonBuilder = new StringBuilder();

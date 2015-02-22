@@ -5,8 +5,8 @@ using System.Net;
 using System.Threading.Tasks;
 using Mannex;
 using Mannex.Threading.Tasks;
-using Newtonsoft.Json;
 using Mannex.Web;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 
 namespace Elmah.Io.Client
@@ -16,6 +16,8 @@ namespace Elmah.Io.Client
         private readonly Guid _logId;
         private readonly Uri _url = new Uri("https://elmah.io/");
         private readonly IWebClient _webClient;
+
+        public event EventHandler<MessageEventArgs> OnMessage;
 
         public Logger(Guid logId) : this(logId, null)
         {
@@ -103,6 +105,7 @@ namespace Elmah.Io.Client
             if (exception != null)
             {
                 message.Detail = exception.ToString();
+                message.Data = exception.ToDataList();
             }
 
             Log(message);
@@ -115,6 +118,8 @@ namespace Elmah.Io.Client
 
         public IAsyncResult BeginLog(Message message, AsyncCallback asyncCallback, object asyncState)
         {
+            if (OnMessage != null) OnMessage(this, new MessageEventArgs {Message = message});
+
             var headers = new WebHeaderCollection { { HttpRequestHeader.ContentType, "application/json" } };
 
             var json = JsonConvert.SerializeObject(message, new JsonSerializerSettings {ContractResolver = new CamelCasePropertyNamesContractResolver()});

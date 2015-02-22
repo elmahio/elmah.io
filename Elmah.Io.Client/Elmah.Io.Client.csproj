@@ -45,6 +45,7 @@
   <ItemGroup>
     <Compile Include="AsyncExtensions.cs" />
     <Compile Include="DotNetWebClientProxy.cs" />
+    <Compile Include="ExceptionExtensions.cs" />
     <Compile Include="ILogger.cs" />
     <Compile Include="IWebClient.cs" />
     <Compile Include="IWebClientExtensions.cs" />
@@ -57,6 +58,7 @@
     <Compile Include="Mannex\Threading\Tasks\TaskFactory.cs" />
     <Compile Include="Mannex\Web\NameValueCollection.cs" />
     <Compile Include="Message.cs" />
+    <Compile Include="MessageEventArgs.cs" />
     <Compile Include="MessagesResult.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

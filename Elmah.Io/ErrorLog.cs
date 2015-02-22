@@ -70,6 +70,7 @@ namespace Elmah.Io
                 StatusCode = error.StatusCode,
                 Type = error.Type,
                 User = error.User,
+                Data = error.Exception.ToDataList(),
             };
 
             return _client.BeginLog(message, asyncCallback, asyncState);

@@ -41,6 +41,8 @@ namespace Elmah.Io.Client
         public List<Item> QueryString { get; set; }
 
         public List<Item> ServerVariables { get; set; }
+
+        public List<Item> Data { get; set; }
     }
 
     public enum Severity
