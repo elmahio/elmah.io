@@ -16,12 +16,17 @@ namespace Elmah.Io
 
         public ErrorLog(Guid logId)
         {
-            _client = Logger.Create(logId);
+            _client = Io.Client.Logger.Create(logId);
         }
 
         public ErrorLog(ILogger logger)
         {
             _client = logger;
+        }
+
+        public ILogger Logger
+        {
+            get { return _client; }
         }
 
         /// <summary>

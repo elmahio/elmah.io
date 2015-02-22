@@ -4,6 +4,8 @@ namespace Elmah.Io.Client
 {
     public interface ILogger
     {
+        event EventHandler<MessageEventArgs> OnMessage;
+
         string Log(Message message);
         IAsyncResult BeginLog(Message message, AsyncCallback asyncCallback, object asyncState);
         string EndLog(IAsyncResult asyncResult);

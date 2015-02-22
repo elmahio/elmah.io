@@ -1,10 +1,13 @@
 ﻿using System;
 using System.Collections;
+using Elmah.Io.Client;
 
 namespace Elmah.Io
 {
     public interface IErrorLog
     {
+        ILogger Logger { get; }
+
         string Log(Error error);
         IAsyncResult BeginLog(Error error, AsyncCallback asyncCallback, object asyncState);
         string EndLog(IAsyncResult asyncResult);
