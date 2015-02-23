@@ -118,7 +118,7 @@ namespace Elmah.Io.Tests
 
             var eventHandlerWasCalled = false;
 
-            logger.OnMessage += (sender, args) =>
+            Logger.OnMessage += (sender, args) =>
             {
                 eventHandlerWasCalled = true;
             };

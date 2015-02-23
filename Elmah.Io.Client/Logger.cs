@@ -17,7 +17,7 @@ namespace Elmah.Io.Client
         private readonly Uri _url = new Uri("https://elmah.io/");
         private readonly IWebClient _webClient;
 
-        public event EventHandler<MessageEventArgs> OnMessage;
+        public static event EventHandler<MessageEventArgs> OnMessage;
 
         public Logger(Guid logId) : this(logId, null)
         {

@@ -24,11 +24,6 @@ namespace Elmah.Io
             _client = logger;
         }
 
-        public ILogger Logger
-        {
-            get { return _client; }
-        }
-
         /// <summary>
         /// ELMAH doesn't use this constructor and it is only published in order for you to create
         /// a new error logger using a custom implementation of IWebClient. If you do so, please
