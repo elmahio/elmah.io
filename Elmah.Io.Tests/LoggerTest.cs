@@ -1,11 +1,10 @@
-﻿using System.Linq;
-using Elmah.Io.Client;
-using System;
-using System.Collections;
+﻿using System;
 using System.Globalization;
+using System.Linq;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
+using Elmah.Io.Client;
 using Moq;
 using NUnit.Framework;
 using Ploeh.AutoFixture;
@@ -95,7 +94,6 @@ namespace Elmah.Io.Tests
                 .Returns(Task.FromResult(buildJson));
 
             var logger = new Logger(logId, null, webClientMock.Object);
-            var results = new ArrayList();
 
             // Act
             var result = logger.GetMessages(pageIndex, pageSize);
@@ -109,6 +107,40 @@ namespace Elmah.Io.Tests
         }
 
         [Test]
+        public void CanRegisterForMessageFailEvent()
+        {
+            // Arrange
+            var logId = _fixture.Create<Guid>();
+            var webClientMock = new Mock<IWebClient>();
+            webClientMock
+                .Setup(x => x.Post(It.IsAny<WebHeaderCollection>(), It.IsAny<Uri>(), It.IsAny<string>(), It.IsAny<Func<WebHeaderCollection, string, string>>()))
+                .Returns(Task.Factory.StartNew<string>(() =>
+                {
+                    throw new System.ApplicationException("Some shit happened");
+                }));
+            var logger = new Logger(logId, null, webClientMock.Object);
+
+            var eventHandlerWasCalled = false;
+            Exception exception = null;
+            Message message = null;
+
+            Logger.OnMessageFail += (sender, args) =>
+            {
+                eventHandlerWasCalled = true;
+                exception = args.Error;
+                message = args.Message;
+            };
+
+            // Act
+            logger.Log(_fixture.Create<Message>());
+
+            // Assert
+            Assert.That(eventHandlerWasCalled);
+            Assert.That(exception, Is.Not.Null);
+            Assert.That(message, Is.Not.Null);
+        }
+
+        [Test]
         public void CanRegisterForMessageEvent()
         {
             // Arrange
@@ -117,10 +149,12 @@ namespace Elmah.Io.Tests
             var logger = new Logger(logId, null, webClientMock.Object);
 
             var eventHandlerWasCalled = false;
+            Message message = null;
 
             Logger.OnMessage += (sender, args) =>
             {
                 eventHandlerWasCalled = true;
+                message = args.Message;
             };
 
             // Act
@@ -128,6 +162,7 @@ namespace Elmah.Io.Tests
 
             // Assert
             Assert.That(eventHandlerWasCalled);
+            Assert.That(message, Is.Not.Null);
         }
 
         private string BuildJson(MessagesResult messages)

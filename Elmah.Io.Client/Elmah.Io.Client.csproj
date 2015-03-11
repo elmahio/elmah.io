@@ -46,6 +46,7 @@
     <Compile Include="AsyncExtensions.cs" />
     <Compile Include="DotNetWebClientProxy.cs" />
     <Compile Include="ExceptionExtensions.cs" />
+    <Compile Include="FailEventArgs.cs" />
     <Compile Include="ILogger.cs" />
     <Compile Include="IWebClient.cs" />
     <Compile Include="IWebClientExtensions.cs" />

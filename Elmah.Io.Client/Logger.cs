@@ -17,7 +17,18 @@ namespace Elmah.Io.Client
         private readonly Uri _url = new Uri("https://elmah.io/");
         private readonly IWebClient _webClient;
 
+        /// <summary>
+        /// By subscribing to the OnMessage event, you can hook into the pipeline of logging a message to elmah.io.
+        /// The event is triggered just before calling elmah.io's API. Be aware that the OnMessage event is static,
+        /// why event handlers are called for all instances of the Logger type.
+        /// </summary>
         public static event EventHandler<MessageEventArgs> OnMessage;
+
+        /// <summary>
+        /// By subscribing to the OnMessageFail event, you can get a call if an error happened while logging a message
+        /// to elmah.io. In this case you should do something to log the message elsewhere.
+        /// </summary>
+        public static event EventHandler<FailEventArgs> OnMessageFail;
 
         public Logger(Guid logId) : this(logId, null)
         {
@@ -118,7 +129,7 @@ namespace Elmah.Io.Client
 
         public IAsyncResult BeginLog(Message message, AsyncCallback asyncCallback, object asyncState)
         {
-            if (OnMessage != null) OnMessage(this, new MessageEventArgs {Message = message});
+            if (OnMessage != null) OnMessage(this, new MessageEventArgs(message));
 
             var headers = new WebHeaderCollection { { HttpRequestHeader.ContentType, "application/json" } };
 
@@ -129,6 +140,7 @@ namespace Elmah.Io.Client
                              {
                                  if (t.Status != TaskStatus.RanToCompletion)
                                  {
+                                     if (OnMessageFail != null) OnMessageFail(this, new FailEventArgs(message, t.Exception));
                                      return null;
                                  }
 
