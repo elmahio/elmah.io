@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections;
+using Elmah.Io.Client;
 
 namespace Elmah.Io
 {

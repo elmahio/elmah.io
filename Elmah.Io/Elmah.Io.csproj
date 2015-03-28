@@ -36,63 +36,36 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\elmah.corelibrary.1.2.2\lib\Elmah.dll</HintPath>
     </Reference>
-    <Reference Include="Newtonsoft.Json, Version=4.5.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\Newtonsoft.Json.5.0.6\lib\net40\Newtonsoft.Json.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
-    <Reference Include="System.Web" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AsyncExtensions.cs" />
-    <Compile Include="DotNetWebClientProxy.cs" />
-    <Compile Include="ErrorExtensions.cs" />
     <Compile Include="ErrorLog.cs" />
     <Compile Include="IErrorLog.cs" />
-    <Compile Include="IWebClient.cs" />
-    <Compile Include="IWebClientExtensions.cs" />
-    <Compile Include="Mannex\Int32.cs" />
-    <Compile Include="Mannex\Net\Mime\ContentType.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Mannex\Net\WebHeaderCollection.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Mannex\Threading\Tasks\Task.cs" />
-    <Compile Include="Mannex\Threading\Tasks\TaskCompletionSource.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Mannex\Threading\Tasks\TaskFactory.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Mannex\Web\NameValueCollection.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="packages.config" />
+    <None Include="packages.config">
+      <SubType>Designer</SubType>
+    </None>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <ProjectReference Include="..\Elmah.Io.Client\Elmah.Io.Client.csproj">
+      <Project>{52b1d9ee-787c-4f42-accc-9a46f365cfd5}</Project>
+      <Name>Elmah.Io.Client</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
   </Target>
-  -->
-  <UsingTask TaskName="ILMerge.MSBuild.Tasks.ILMerge" AssemblyFile="$(SolutionDir)\packages\ILMerge.MSBuild.Tasks.1.0.0.3\tools\ILMerge.MSBuild.Tasks.dll" Condition="$(Configuration) == 'Release'" />
   <Target Name="AfterBuild">
-    <ItemGroup>
-      <MergeAsm Include="bin\$(Configuration)\Elmah.Io.dll" />
-      <MergeAsm Include="bin\$(Configuration)\Newtonsoft.Json.dll" />
-    </ItemGroup>
-    <PropertyGroup>
-      <MergedAssembly>$(ProjectDir)$(OutDir)Elmah.Io.dll</MergedAssembly>
-    </PropertyGroup>
-    <ILMerge InputAssemblies="@(MergeAsm)" OutputFile="$(MergedAssembly)" Internalize="true" Condition="$(Configuration) == 'Release'" />
   </Target>
+  -->
 </Project>

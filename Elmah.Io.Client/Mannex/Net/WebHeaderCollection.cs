@@ -21,12 +21,14 @@
 //
 #endregion
 
+using System;
+using System.Net;
+
 namespace Mannex.Net
 {
     #region Imports
 
-    using System;
-    using System.Net;
+    
 
     #endregion
 

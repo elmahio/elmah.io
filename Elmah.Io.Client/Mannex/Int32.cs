@@ -21,14 +21,14 @@
 //
 #endregion
 
+using System.Diagnostics;
+using System.Globalization;
+
 namespace Mannex
 {
     #region Imports
 
-    using System;
-    using System.Collections.Generic;
-    using System.Diagnostics;
-    using System.Globalization;
+    
 
     #endregion
 

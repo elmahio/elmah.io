@@ -5,8 +5,8 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("Elmah.Io")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyTitle("Elmah.Io.Client")]
+[assembly: AssemblyDescription(".NET client for communicating with the elmah.io V2 API")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("elmah.io")]
 [assembly: AssemblyProduct("elmah.io")]
@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("82e24bdf-d6dd-4c4f-a9c3-c30c2f42e583")]
+[assembly: Guid("3f07bd79-1fb2-46f0-b070-f7795467717b")]
 
 // Version information for an assembly consists of the following four values:
 //
@@ -34,3 +34,4 @@ using System.Runtime.InteropServices;
 // [assembly: AssemblyVersion("1.0.*")]
 [assembly: AssemblyVersion("2.0.0.0")]
 [assembly: AssemblyFileVersion("2.0.0.0")]
+[assembly: InternalsVisibleTo("Elmah.Io.Tests")]
