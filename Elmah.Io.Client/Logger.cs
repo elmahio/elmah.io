@@ -19,8 +19,7 @@ namespace Elmah.Io.Client
 
         /// <summary>
         /// By subscribing to the OnMessage event, you can hook into the pipeline of logging a message to elmah.io.
-        /// The event is triggered just before calling elmah.io's API. Be aware that the OnMessage event is static,
-        /// why event handlers are called for all instances of the Logger type.
+        /// The event is triggered just before calling elmah.io's API.
         /// </summary>
         public static event EventHandler<MessageEventArgs> OnMessage;
 
@@ -30,10 +29,18 @@ namespace Elmah.Io.Client
         /// </summary>
         public static event EventHandler<FailEventArgs> OnMessageFail;
 
+        /// <summary>
+        /// Creates a new logger with the specified log ID. The logger is configured to use elmah.io's API.
+        /// This is probably the constructor you want to use 99 % of the times.
+        /// </summary>
         public Logger(Guid logId) : this(logId, null)
         {
         }
 
+        /// <summary>
+        /// Creates a new logger with the specified log ID and URL. This constructor is primarily ment for test
+        /// purposes or if you are using a version of the elmah.io API not at its official location.
+        /// </summary>
         public Logger(Guid logId, Uri url) : this(logId, url, new DotNetWebClientProxy())
         {
         }
@@ -45,66 +52,105 @@ namespace Elmah.Io.Client
             _webClient = webClient;
         }
 
+        /// <summary>
+        /// Creates a instance of the logger. Do exactly the same as calling the constructor with a Guid parameter.
+        /// </summary>
         public static Logger Create(Guid logId)
         {
             return new Logger(logId);
         }
 
+        /// <summary>
+        /// Write a log message with the Verbose severity.
+        /// </summary>
         public void Verbose(string messageTemplate, params object[] propertyValues)
         {
             Verbose(null, messageTemplate, propertyValues);
         }
 
+        /// <summary>
+        /// Write a log message with the Verbose severity and associated exception.
+        /// </summary>
         public void Verbose(Exception exception, string messageTemplate, params object[] propertyValues)
         {
             Log(exception, Severity.Verbose, messageTemplate, propertyValues);
         }
 
+        /// <summary>
+        /// Write a log message with the Debug severity.
+        /// </summary>
         public void Debug(string messageTemplate, params object[] propertyValues)
         {
             Debug(null, messageTemplate, propertyValues);
         }
 
+        /// <summary>
+        /// Write a log message with the Debug severity and associated exception.
+        /// </summary>
         public void Debug(Exception exception, string messageTemplate, params object[] propertyValues)
         {
             Log(exception, Severity.Debug, messageTemplate, propertyValues);
         }
 
+        /// <summary>
+        /// Write a log message with the Information severity.
+        /// </summary>
         public void Information(string messageTemplate, params object[] propertyValues)
         {
             Information(null, messageTemplate, propertyValues);
         }
 
+        /// <summary>
+        /// Write a log message with the Information severity and associated exception.
+        /// </summary>
         public void Information(Exception exception, string messageTemplate, params object[] propertyValues)
         {
             Log(exception, Severity.Information, messageTemplate, propertyValues);
         }
 
+        /// <summary>
+        /// Write a log message with the Warning severity.
+        /// </summary>
         public void Warning(string messageTemplate, params object[] propertyValues)
         {
             Warning(null, messageTemplate, propertyValues);
         }
 
+        /// <summary>
+        /// Write a log message with the Warning severity and associated exception.
+        /// </summary>
         public void Warning(Exception exception, string messageTemplate, params object[] propertyValues)
         {
             Log(exception, Severity.Warning, messageTemplate, propertyValues);
         }
 
+        /// <summary>
+        /// Write a log message with the Error severity.
+        /// </summary>
         public void Error(string messageTemplate, params object[] propertyValues)
         {
             Error(null, messageTemplate, propertyValues);
         }
 
+        /// <summary>
+        /// Write a log message with the Error severity and associated exception.
+        /// </summary>
         public void Error(Exception exception, string messageTemplate, params object[] propertyValues)
         {
             Log(exception, Severity.Error, messageTemplate, propertyValues);
         }
 
+        /// <summary>
+        /// Write a log message with the Fatal severity.
+        /// </summary>
         public void Fatal(string messageTemplate, params object[] propertyValues)
         {
             Fatal(null, messageTemplate, propertyValues);
         }
 
+        /// <summary>
+        /// Write a log message with the Verbose Fatal and associated exception.
+        /// </summary>
         public void Fatal(Exception exception, string messageTemplate, params object[] propertyValues)
         {
             Log(exception, Severity.Fatal, messageTemplate, propertyValues);
@@ -122,11 +168,17 @@ namespace Elmah.Io.Client
             Log(message);
         }
 
+        /// <summary>
+        /// Write a log message using the specified Message. The message encapsulates the data included in properties.
+        /// </summary>
         public string Log(Message message)
         {
             return EndLog(BeginLog(message, null, null));
         }
 
+        /// <summary>
+        /// Async write a log message using the specified Message. The message encapsulates the data included in properties.
+        /// </summary>
         public IAsyncResult BeginLog(Message message, AsyncCallback asyncCallback, object asyncState)
         {
             if (OnMessage != null) OnMessage(this, new MessageEventArgs(message));
@@ -158,16 +210,25 @@ namespace Elmah.Io.Client
                              .Apmize(asyncCallback, asyncState);
         }
 
+        /// <summary>
+        /// Async end of writing a log message.
+        /// </summary>
         public string EndLog(IAsyncResult asyncResult)
         {
             return EndImpl<string>(asyncResult);
         }
 
+        /// <summary>
+        /// Gets a log message by its ID.
+        /// </summary>
         public Message GetMessage(string id)
         {
             return EndGetMessage(BeginGetMessage(id, null, null));
         }
 
+        /// <summary>
+        /// Async gets a log message by its ID.
+        /// </summary>
         public IAsyncResult BeginGetMessage(string id, AsyncCallback asyncCallback, object asyncState)
         {
             return _webClient.Get(ApiUrl(new NameValueCollection { { "id", id } }))
@@ -184,16 +245,25 @@ namespace Elmah.Io.Client
                              .Apmize(asyncCallback, asyncState);
         }
 
+        /// <summary>
+        /// Async end of get log message.
+        /// </summary>
         public Message EndGetMessage(IAsyncResult asyncResult)
         {
             return EndImpl<Message>(asyncResult);
         }
 
+        /// <summary>
+        /// Get all messages in the specified page and in the page size.
+        /// </summary>
         public MessagesResult GetMessages(int pageIndex, int pageSize)
         {
             return EndGetMessages(BeginGetMessages(pageIndex, pageSize, null, null));
         }
 
+        /// <summary>
+        /// Async get all messages in the specified page and in the page size.
+        /// </summary>
         public IAsyncResult BeginGetMessages(int pageIndex, int pageSize, AsyncCallback asyncCallback, object asyncState)
         {
             var url = ApiUrl(new NameValueCollection
@@ -215,6 +285,9 @@ namespace Elmah.Io.Client
             }).Apmize(asyncCallback, asyncState);
         }
 
+        /// <summary>
+        /// Async end of getting all messages.
+        /// </summary>
         public MessagesResult EndGetMessages(IAsyncResult asyncResult)
         {
             return EndImpl<MessagesResult>(asyncResult);
