@@ -10,42 +10,47 @@ namespace Elmah.Io
 {
     public class ErrorLog : Elmah.ErrorLog, IErrorLog
     {
-        private readonly ILogger _client;
-
-        public Uri Url { get; private set; }
-
-        public ErrorLog(Guid logId)
-        {
-            _client = Io.Client.Logger.Create(logId);
-        }
-
-        public ErrorLog(ILogger logger)
-        {
-            _client = logger;
-        }
+        public static ILogger Client;
 
         /// <summary>
         /// ELMAH doesn't use this constructor and it is only published in order for you to create
-        /// a new error logger using a custom implementation of IWebClient. If you do so, please
-        /// identify yourself using an appropriate user agent.
+        /// a new error logger using a custom implementation of ILogger or an instance of Logger that
+        /// you've already created. If you implement your own ILogger, please  identify yourself
+        /// using an appropriate user agent.
+        /// </summary>
+        public ErrorLog(ILogger logger)
+        {
+            Client = logger;
+        }
+
+        /// <summary>
+        /// The constructor used by ELMAH. ELMAH provides key/value pairs in the config dictionary,
+        /// as specified in attributes in the ELMAH XML configuration (web.config).
+        /// This constructor intentionally handles the internal ILogger instance as singleton.
+        /// ELMAH calls this constructor one time per error logged and to only create the logger
+        /// once, letting you listen for events on the logger etc., the logger needs to be
+        /// singleton.
         /// </summary>
         public ErrorLog(IDictionary config)
         {
-            if (config == null) 
+            if (Client != null) return;
+            
+            if (config == null)
             {
                 throw new ArgumentNullException("config");
             }
 
             if (!config.Contains("LogId") && !config.Contains("LogIdKey"))
             {
-                throw new ApplicationException("Missing LogId or LogIdKey. Please specify a LogId in your web.config like this: <errorLog type=\"Elmah.Io.ErrorLog, Elmah.Io\" LogId=\"98895825-2516-43DE-B514-FFB39EA89A65\" /> or using AppSettings: <errorLog type=\"Elmah.Io.ErrorLog, Elmah.Io\" LogIdKey=\"MyAppSettingsKey\" /> where MyAppSettingsKey points to a AppSettings with the key 'MyAPpSettingsKey' and value equal LogId.");
+                throw new ApplicationException(
+                    "Missing LogId or LogIdKey. Please specify a LogId in your web.config like this: <errorLog type=\"Elmah.Io.ErrorLog, Elmah.Io\" LogId=\"98895825-2516-43DE-B514-FFB39EA89A65\" /> or using AppSettings: <errorLog type=\"Elmah.Io.ErrorLog, Elmah.Io\" LogIdKey=\"MyAppSettingsKey\" /> where MyAppSettingsKey points to a AppSettings with the key 'MyAPpSettingsKey' and value equal LogId.");
             }
 
             var logId = ResolveLogId(config);
-            Url = ResolveUrl(config);
+            var url = ResolveUrl(config);
             ApplicationName = ResolveApplicationName(config);
 
-            _client = new Logger(logId, Url);
+            Client = new Logger(logId, url);
         }
 
         public override string Log(Error error)
@@ -73,7 +78,7 @@ namespace Elmah.Io
                 Data = error.Exception.ToDataList(),
             };
 
-            return _client.BeginLog(message, asyncCallback, asyncState);
+            return Client.BeginLog(message, asyncCallback, asyncState);
         }
 
         public override string EndLog(IAsyncResult asyncResult)
@@ -83,7 +88,7 @@ namespace Elmah.Io
 
         public override IAsyncResult BeginGetError(string id, AsyncCallback asyncCallback, object asyncState)
         {
-            return _client.BeginGetMessage(id, asyncCallback, asyncCallback);
+            return Client.BeginGetMessage(id, asyncCallback, asyncCallback);
         }
 
         public override ErrorLogEntry EndGetError(IAsyncResult asyncResult)
@@ -139,7 +144,7 @@ namespace Elmah.Io
 
         public override IAsyncResult BeginGetErrors(int pageIndex, int pageSize, IList errorEntryList, AsyncCallback asyncCallback, object asyncState)
         {
-            return _client.BeginGetMessages(pageIndex, pageSize, asyncCallback, errorEntryList);
+            return Client.BeginGetMessages(pageIndex, pageSize, asyncCallback, errorEntryList);
         }
 
         public override int EndGetErrors(IAsyncResult asyncResult)

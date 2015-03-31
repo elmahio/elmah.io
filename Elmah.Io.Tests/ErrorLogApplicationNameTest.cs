@@ -13,6 +13,7 @@ namespace Elmah.Io.Tests
         public void SetUp()
         {
             _fixture = new Fixture();
+            ErrorLog.Client = null;
         }
 
         [Test]

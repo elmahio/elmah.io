@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections;
+using Elmah.Io.Client;
 using NUnit.Framework;
 using Ploeh.AutoFixture;
 
@@ -13,6 +14,7 @@ namespace Elmah.Io.Tests
         public void SetUp()
         {
             _fixture = new Fixture();
+            ErrorLog.Client = null;
         }
 
         [Test]
@@ -26,7 +28,9 @@ namespace Elmah.Io.Tests
             errorLog.Log(new Error(new System.ApplicationException()));
 
             // Assert
-            Assert.That(errorLog.Url, Is.EqualTo(configUri));
+            var client = ErrorLog.Client as Logger;
+            Assert.That(client != null);
+            Assert.That(client.Url, Is.EqualTo(configUri));
         }
     }
 }

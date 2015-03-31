@@ -6,6 +6,12 @@ namespace Elmah.Io.Tests
 {
     public class ErrorLogErrorHandlingTest
     {
+        [SetUp]
+        public void SetUp()
+        {
+            ErrorLog.Client = null;
+        }
+
         [Test]
         public void AssertThrowsArgumentNullExceptionOnMissingConfig()
         {

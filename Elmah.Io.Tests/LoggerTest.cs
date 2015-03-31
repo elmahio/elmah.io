@@ -124,7 +124,7 @@ namespace Elmah.Io.Tests
             Exception exception = null;
             Message message = null;
 
-            Logger.OnMessageFail += (sender, args) =>
+            logger.OnMessageFail += (sender, args) =>
             {
                 eventHandlerWasCalled = true;
                 exception = args.Error;
@@ -151,7 +151,7 @@ namespace Elmah.Io.Tests
             var eventHandlerWasCalled = false;
             Message message = null;
 
-            Logger.OnMessage += (sender, args) =>
+            logger.OnMessage += (sender, args) =>
             {
                 eventHandlerWasCalled = true;
                 message = args.Message;
