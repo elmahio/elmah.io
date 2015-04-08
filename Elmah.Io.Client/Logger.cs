@@ -7,6 +7,7 @@ using Mannex;
 using Mannex.Threading.Tasks;
 using Mannex.Web;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Serialization;
 
 namespace Elmah.Io.Client
@@ -141,7 +142,9 @@ namespace Elmah.Io.Client
 
             var headers = new WebHeaderCollection { { HttpRequestHeader.ContentType, "application/json" } };
 
-            var json = JsonConvert.SerializeObject(message, new JsonSerializerSettings {ContractResolver = new CamelCasePropertyNamesContractResolver()});
+            var jsonSerializerSettings = new JsonSerializerSettings {ContractResolver = new CamelCasePropertyNamesContractResolver()};
+            jsonSerializerSettings.Converters.Add(new StringEnumConverter());
+            var json = JsonConvert.SerializeObject(message, jsonSerializerSettings);
 
             return _webClient.Post(headers, ApiUrl(), json)
                              .ContinueWith(t =>

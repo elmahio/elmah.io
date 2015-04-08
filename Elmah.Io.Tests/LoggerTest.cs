@@ -47,7 +47,9 @@ namespace Elmah.Io.Tests
             Assert.That(result, Is.EqualTo(id));
             Assert.That(requestHeaders[HttpRequestHeader.ContentType], Is.EqualTo("application/json"));
             Assert.That(actualUri.AbsoluteUri, Is.Not.Null.And.StringEnding(string.Format("api/v2/messages?logId={0}", logId)));
-            Assert.That(actualData, Is.Not.Null.And.StringContaining(message.Title));
+            Assert.That(actualData, Is.Not.Null);
+            Assert.That(actualData, Is.StringContaining(message.Title));
+            Assert.That(actualData, Is.StringContaining(message.Severity.ToString()));
         }
 
         [Test]
