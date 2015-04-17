@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Elmah.Io.Client;
 using Moq;
+using Newtonsoft.Json;
 using NUnit.Framework;
 using Ploeh.AutoFixture;
 
@@ -50,6 +51,34 @@ namespace Elmah.Io.Tests
             Assert.That(actualData, Is.Not.Null);
             Assert.That(actualData, Is.StringContaining(message.Title));
             Assert.That(actualData, Is.StringContaining(message.Severity.ToString()));
+        }
+
+        [Test]
+        public void CanLogMessageThroughHelpers()
+        {
+            // Arrange
+            var logId = _fixture.Create<Guid>();
+            string actualData = null;
+
+            var webClientMock = new Mock<IWebClient>();
+            webClientMock
+                .Setup(x => x.Post(It.IsAny<WebHeaderCollection>(), It.IsAny<Uri>(), It.IsAny<string>(), It.IsAny<Func<WebHeaderCollection, string, string>>()))
+                .Callback<WebHeaderCollection, Uri, string, Func<WebHeaderCollection, string, string>>((headers, uri, data, resultor) => { actualData = data; })
+                .Returns(Task.FromResult(string.Empty));
+
+            var logger = new Logger(logId, null, webClientMock.Object);
+
+            var utcNowInJson = JsonConvert.SerializeObject(DateTime.UtcNow);
+            var value = _fixture.Create<string>();
+
+            // Act
+            logger.Verbose("{0}", value);
+
+            // Assert
+            Assert.That(actualData, Is.Not.Null);
+            Assert.That(actualData, Is.StringContaining(value));
+            Assert.That(actualData, Is.StringContaining(Severity.Verbose.ToString()));
+            Assert.That(actualData, Is.StringContaining(utcNowInJson.Substring(0, 11)));
         }
 
         [Test]

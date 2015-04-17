@@ -138,6 +138,7 @@ namespace Elmah.Io.Client
 
         public IAsyncResult BeginLog(Message message, AsyncCallback asyncCallback, object asyncState)
         {
+            if (message.DateTime == DateTime.MinValue) message.DateTime = DateTime.UtcNow;
             if (OnMessage != null) OnMessage(this, new MessageEventArgs(message));
 
             var headers = new WebHeaderCollection { { HttpRequestHeader.ContentType, "application/json" } };
