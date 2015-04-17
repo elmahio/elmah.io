@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Elmah.Io.Client;
 using Moq;
-using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 using NUnit.Framework;
 using Ploeh.AutoFixture;
 
@@ -68,7 +68,7 @@ namespace Elmah.Io.Tests
 
             var logger = new Logger(logId, null, webClientMock.Object);
 
-            var utcNowInJson = JsonConvert.SerializeObject(DateTime.UtcNow);
+            var utcDate = DateTime.UtcNow.ToString("yyyy-MM-dd");
             var value = _fixture.Create<string>();
 
             // Act
@@ -78,7 +78,7 @@ namespace Elmah.Io.Tests
             Assert.That(actualData, Is.Not.Null);
             Assert.That(actualData, Is.StringContaining(value));
             Assert.That(actualData, Is.StringContaining(Severity.Verbose.ToString()));
-            Assert.That(actualData, Is.StringContaining(utcNowInJson.Substring(0, 11)));
+            Assert.That(actualData, Is.StringContaining(utcDate));
         }
 
         [Test]
