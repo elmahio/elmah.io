@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using Elmah.Io.Client;
 using NUnit.Framework;
 using Ploeh.AutoFixture;
@@ -28,7 +29,7 @@ namespace Elmah.Io.Tests
         {
             // Arrange
             var fixture = new Fixture();
-            var loggerOptions = new LoggerOptions {Durable = true, Url = fixture.Create<Uri>()};
+            var loggerOptions = new LoggerOptions {Durable = true, FailedRequestPath = Path.GetTempPath(), Url = fixture.Create<Uri>()};
             var loggerConfiguration = new LoggerConfiguration();
 
             // Act
