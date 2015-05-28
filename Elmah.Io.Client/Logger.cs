@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Specialized;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
+using System.Timers;
 using Mannex;
 using Mannex.Threading.Tasks;
 using Mannex.Web;
@@ -18,21 +20,23 @@ namespace Elmah.Io.Client
     public class Logger : ILogger
     {
         private readonly Guid _logId;
-        private readonly Uri _url = new Uri("https://elmah.io/");
-        private readonly IWebClient _webClient;
 
         public Guid LogId { get { return _logId; } }
-        public Uri Url { get { return _url; } }
+        [Obsolete("Use Options.Url")]
+        public Uri Url { get { return Options.Url; } }
+        public LoggerOptions Options { get; set; }
 
         public event EventHandler<MessageEventArgs> OnMessage;
 
         public event EventHandler<FailEventArgs> OnMessageFail;
 
+        private bool _handleFailingMessages;
+
         /// <summary>
         /// Creates a new logger with the specified log ID. The logger is configured to use elmah.io's API.
         /// This is probably the constructor you want to use 99 % of the times.
         /// </summary>
-        public Logger(Guid logId) : this(logId, null)
+        public Logger(Guid logId) : this(logId, new LoggerOptions())
         {
         }
 
@@ -40,15 +44,63 @@ namespace Elmah.Io.Client
         /// Creates a new logger with the specified log ID and URL. This constructor is primarily ment for test
         /// purposes or if you are using a version of the elmah.io API not at its official location.
         /// </summary>
-        public Logger(Guid logId, Uri url) : this(logId, url, new DotNetWebClientProxy())
+        [Obsolete("To create a new logger, use LoggerConfiguration or the constructor with a LoggerOptions parameter")]
+        public Logger(Guid logId, Uri url) : this(logId, new LoggerOptions {Url = url})
         {
         }
 
-        internal Logger(Guid logId, Uri url, IWebClient webClient)
+        public Logger(Guid logId, LoggerOptions options)
         {
+            if (logId == Guid.Empty) throw new ArgumentException("Set logId to a valid GUID");
+            if (options == null) throw new ArgumentException("Set options to a new LoggerOptions object");
+            if (options.Url == null) options.Url = new Uri(LoggerOptions.ElmahIoApiUrl);
+            if (options.WebClient == null) options.WebClient = new DotNetWebClientProxy();
+            if (!string.IsNullOrWhiteSpace(options.FailedRequestPath) && !Directory.Exists(options.FailedRequestPath)) throw new ArgumentException("Please specify an existing directory");
+            if (options.Durable && string.IsNullOrWhiteSpace(options.FailedRequestPath)) throw new ArgumentException("When running in Durable mode remember to set FailedRequestPath");
+
             _logId = logId;
-            if (url != null) _url = url;
-            _webClient = webClient;
+            Options = options;
+
+            if (Options.Durable)
+            {
+                var timer = new Timer(5000);
+                timer.Elapsed += OnTick;
+                timer.Start();
+            }
+        }
+
+        private void OnTick(object sender, ElapsedEventArgs elapsedEventArgs)
+        {
+            // Wait until previous tick finishes
+            if (_handleFailingMessages) return;
+
+            try
+            {
+                _handleFailingMessages = true;
+                var messages = Directory.GetFiles(Options.FailedRequestPath, "*.json");
+                var jsonSerializerSettings = GetJsonSerializerSettings();
+                foreach (var messagePath in messages)
+                {
+                    var messageJson = File.ReadAllText(messagePath);
+                    var message = JsonConvert.DeserializeObject<Message>(messageJson, jsonSerializerSettings);
+                    try
+                    {
+                        Log(message);
+                    }
+                    finally
+                    {
+                        // We can delete this file weather or not it fails again. Failing requests will write a new json file to disk.
+                        File.Delete(messagePath);
+                    }
+                }
+            }
+            catch
+            {
+            }
+            finally
+            {
+                _handleFailingMessages = false;
+            }
         }
 
         /// <summary>
@@ -143,16 +195,15 @@ namespace Elmah.Io.Client
 
             var headers = new WebHeaderCollection { { HttpRequestHeader.ContentType, "application/json" } };
 
-            var jsonSerializerSettings = new JsonSerializerSettings {ContractResolver = new CamelCasePropertyNamesContractResolver()};
-            jsonSerializerSettings.Converters.Add(new StringEnumConverter());
+            var jsonSerializerSettings = GetJsonSerializerSettings();
             var json = JsonConvert.SerializeObject(message, jsonSerializerSettings);
 
-            return _webClient.Post(headers, ApiUrl(), json)
+            return Options.WebClient.Post(headers, ApiUrl(), json)
                              .ContinueWith(t =>
                              {
                                  if (t.Status != TaskStatus.RanToCompletion)
                                  {
-                                     if (OnMessageFail != null) OnMessageFail(this, new FailEventArgs(message, t.Exception));
+                                     HandleError(message, t, json);
                                      return null;
                                  }
 
@@ -170,6 +221,26 @@ namespace Elmah.Io.Client
                              .Apmize(asyncCallback, asyncState);
         }
 
+        private static JsonSerializerSettings GetJsonSerializerSettings()
+        {
+            var jsonSerializerSettings = new JsonSerializerSettings
+            {
+                ContractResolver = new CamelCasePropertyNamesContractResolver()
+            };
+            jsonSerializerSettings.Converters.Add(new StringEnumConverter());
+            return jsonSerializerSettings;
+        }
+
+        private void HandleError(Message message, Task<string> t, string json)
+        {
+            if (OnMessageFail != null) OnMessageFail(this, new FailEventArgs(message, t.Exception));
+            if (!string.IsNullOrWhiteSpace(Options.FailedRequestPath))
+            {
+                var filename = string.Format("{0}-{1}.json", message.DateTime.Ticks, DateTime.UtcNow.Ticks);
+                File.WriteAllText(Path.Combine(Options.FailedRequestPath, filename), json);
+            }
+        }
+
         public string EndLog(IAsyncResult asyncResult)
         {
             return EndImpl<string>(asyncResult);
@@ -182,7 +253,7 @@ namespace Elmah.Io.Client
 
         public IAsyncResult BeginGetMessage(string id, AsyncCallback asyncCallback, object asyncState)
         {
-            return _webClient.Get(ApiUrl(new NameValueCollection { { "id", id } }))
+            return Options.WebClient.Get(ApiUrl(new NameValueCollection { { "id", id } }))
                              .ContinueWith(t =>
                              {
                                  if (t.Status != TaskStatus.RanToCompletion)
@@ -214,7 +285,7 @@ namespace Elmah.Io.Client
                 { "pagesize", pageSize.ToInvariantString() }, 
             });
 
-            return _webClient.Get(url).ContinueWith(t =>
+            return Options.WebClient.Get(url).ContinueWith(t =>
             {
                 if (t.Status != TaskStatus.RanToCompletion)
                 {
@@ -255,7 +326,7 @@ namespace Elmah.Io.Client
                 { "logId", _logId.ToString() }, 
                 query ?? new NameValueCollection()
             };
-            return new Uri(_url, "api/v2/messages" + q.ToQueryString());
+            return new Uri(Options.Url, "api/v2/messages" + q.ToQueryString());
         }
     }
 }

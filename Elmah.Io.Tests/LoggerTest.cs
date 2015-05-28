@@ -6,7 +6,6 @@ using System.Text;
 using System.Threading.Tasks;
 using Elmah.Io.Client;
 using Moq;
-using Newtonsoft.Json.Converters;
 using NUnit.Framework;
 using Ploeh.AutoFixture;
 
@@ -38,7 +37,7 @@ namespace Elmah.Io.Tests
                 .Callback<WebHeaderCollection, Uri, string, Func<WebHeaderCollection, string, string>>((headers, uri, data, resultor) => { requestHeaders = headers; actualUri = uri; actualData = data; })
                 .Returns(Task.FromResult("https://elmah.io/api/v2/messages?id=" + id + "&logid=" + logId));
 
-            var logger = new Logger(logId, null, webClientMock.Object);
+            var logger = new Logger(logId, new LoggerOptions {WebClient = webClientMock.Object});
             var message = _fixture.Create<Message>();
 
             // Act
@@ -66,7 +65,7 @@ namespace Elmah.Io.Tests
                 .Callback<WebHeaderCollection, Uri, string, Func<WebHeaderCollection, string, string>>((headers, uri, data, resultor) => { actualData = data; })
                 .Returns(Task.FromResult(string.Empty));
 
-            var logger = new Logger(logId, null, webClientMock.Object);
+            var logger = new Logger(logId, new LoggerOptions { WebClient = webClientMock.Object });
 
             var utcDate = DateTime.UtcNow.ToString("yyyy-MM-dd");
             var value = _fixture.Create<string>();
@@ -96,7 +95,7 @@ namespace Elmah.Io.Tests
                 .Callback<WebHeaderCollection, Uri, Func<WebHeaderCollection, string, string>>((headers, uri, resultor) => { actualUri = uri; })
                 .Returns(Task.FromResult("{title: \"" + message.Title + "\"}"));
 
-            var logger = new Logger(logId, null, webClientMock.Object);
+            var logger = new Logger(logId, new LoggerOptions { WebClient = webClientMock.Object });
 
             // Act
             var result = logger.GetMessage(id);
@@ -124,7 +123,7 @@ namespace Elmah.Io.Tests
                 .Callback<WebHeaderCollection, Uri, Func<WebHeaderCollection, string, string>>((headers, uri, resultor) => { actualUri = uri; })
                 .Returns(Task.FromResult(buildJson));
 
-            var logger = new Logger(logId, null, webClientMock.Object);
+            var logger = new Logger(logId, new LoggerOptions { WebClient = webClientMock.Object });
 
             // Act
             var result = logger.GetMessages(pageIndex, pageSize);
@@ -149,7 +148,7 @@ namespace Elmah.Io.Tests
                 {
                     throw new System.ApplicationException("Some shit happened");
                 }));
-            var logger = new Logger(logId, null, webClientMock.Object);
+            var logger = new Logger(logId, new LoggerOptions { WebClient = webClientMock.Object });
 
             var eventHandlerWasCalled = false;
             Exception exception = null;
@@ -177,7 +176,7 @@ namespace Elmah.Io.Tests
             // Arrange
             var logId = _fixture.Create<Guid>();
             var webClientMock = new Mock<IWebClient>();
-            var logger = new Logger(logId, null, webClientMock.Object);
+            var logger = new Logger(logId, new LoggerOptions { WebClient = webClientMock.Object });
 
             var eventHandlerWasCalled = false;
             Message message = null;

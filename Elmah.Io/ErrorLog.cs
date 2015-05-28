@@ -48,9 +48,14 @@ namespace Elmah.Io
 
             var logId = ResolveLogId(config);
             var url = ResolveUrl(config);
+            var durable = ResolveDurable(config);
             ApplicationName = ResolveApplicationName(config);
 
-            Client = new Logger(logId, url);
+            Client =
+                new LoggerConfiguration()
+                    .UseLog(logId)
+                    .WithOptions(new LoggerOptions {Durable = durable, Url = url})
+                    .CreateLogger();
         }
 
         public override string Log(Error error)
@@ -107,7 +112,7 @@ namespace Elmah.Io
                 HostName = message.Hostname,
                 Message = message.Title,
                 Source = message.Source,
-                StatusCode = message.StatusCode.HasValue ? message.StatusCode.Value : 0,
+                StatusCode = message.StatusCode ?? 0,
                 Time = message.DateTime,
                 Type = message.Type,
                 User = message.User,
@@ -188,6 +193,17 @@ namespace Elmah.Io
         private string ResolveApplicationName(IDictionary config)
         {
             return config.Contains("applicationName") ? config["applicationName"].ToString() : string.Empty;
+        }
+
+        private bool ResolveDurable(IDictionary config)
+        {
+            if (!config.Contains("Durable"))
+            {
+                return false;
+            }
+
+            bool durable;
+            return bool.TryParse(config["Durable"].ToString(), out durable) && durable;
         }
 
         private Uri ResolveUrl(IDictionary config)

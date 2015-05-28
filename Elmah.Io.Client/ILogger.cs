@@ -19,6 +19,9 @@ namespace Elmah.Io.Client
         /// </summary>
         event EventHandler<FailEventArgs> OnMessageFail;
 
+
+        LoggerOptions Options { get; set; }
+
         /// <summary>
         /// Write a log message using the specified Message. The message encapsulates the data included in properties.
         /// </summary>

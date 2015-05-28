@@ -57,7 +57,7 @@ namespace Elmah.Io.Tests
         [Test]
         public void CanCreateErrorLogWithValidLogId()
         {
-            var logId = new Guid();
+            var logId = Guid.NewGuid();
             var errorLog = new ErrorLog(new Hashtable { { "LogId", logId } });
             Assert.That(errorLog, Is.Not.Null);
         }
