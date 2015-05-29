@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Configuration;
+using System.IO;
 
 namespace Elmah.Io
 {
@@ -24,7 +25,16 @@ namespace Elmah.Io
 
         public static string FailedRequestPath(this IDictionary config)
         {
-            return config.Contains("FailedRequestPath") ? config["FailedRequestPath"].ToString() : null;
+            if (!config.Contains("FailedRequestPath")) return null;
+
+            var failedRequestPath = config["FailedRequestPath"].ToString();
+
+            if (!Path.IsPathRooted(failedRequestPath))
+            {
+                failedRequestPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, failedRequestPath);
+            }
+
+            return failedRequestPath;
         }
 
         public static Uri Url(this IDictionary config)
