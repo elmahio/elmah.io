@@ -51,7 +51,7 @@
     <Compile Include="IWebClient.cs" />
     <Compile Include="IWebClientExtensions.cs" />
     <Compile Include="Logger.cs" />
-    <Compile Include="LoggerConfiguration.cs" />
+    <Compile Include="LoggerConfigurator.cs" />
     <Compile Include="LoggerOptions.cs" />
     <Compile Include="Mannex\Int32.cs" />
     <Compile Include="Mannex\Net\Mime\ContentType.cs" />

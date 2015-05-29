@@ -12,7 +12,7 @@ namespace Elmah.Io.Tests
         public void CanCreateANewLogger()
         {
             // Arrange
-            var loggerConfiguration = new LoggerConfiguration();
+            var loggerConfiguration = new LoggerConfigurator();
 
             // Act
             var logger = loggerConfiguration.UseLog(Guid.NewGuid()).CreateLogger();
@@ -30,7 +30,7 @@ namespace Elmah.Io.Tests
             // Arrange
             var fixture = new Fixture();
             var loggerOptions = new LoggerOptions {Durable = true, FailedRequestPath = Path.GetTempPath(), Url = fixture.Create<Uri>()};
-            var loggerConfiguration = new LoggerConfiguration();
+            var loggerConfiguration = new LoggerConfigurator();
 
             // Act
             var loggerWithOptions = loggerConfiguration.UseLog(Guid.NewGuid()).WithOptions(loggerOptions).CreateLogger();
@@ -44,7 +44,7 @@ namespace Elmah.Io.Tests
         public void CannotCreateLoggerWithoutLogId()
         {
             // Arrange
-            var loggerConfiguration = new LoggerConfiguration();
+            var loggerConfiguration = new LoggerConfigurator();
 
             // Act
             TestDelegate createDelegate = () => loggerConfiguration.CreateLogger();

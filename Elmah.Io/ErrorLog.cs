@@ -52,7 +52,7 @@ namespace Elmah.Io
             ApplicationName = config.ApplicationName();
 
             Client =
-                new LoggerConfiguration()
+                new LoggerConfigurator()
                     .UseLog(logId)
                     .WithOptions(new LoggerOptions {Durable = durable, Url = url, FailedRequestPath = failedRequestPath})
                     .CreateLogger();

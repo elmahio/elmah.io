@@ -2,18 +2,18 @@
 
 namespace Elmah.Io.Client
 {
-    public class LoggerConfiguration
+    public class LoggerConfigurator
     {
         private Guid _logId;
         private LoggerOptions _options;
 
-        public LoggerConfiguration UseLog(Guid logId)
+        public LoggerConfigurator UseLog(Guid logId)
         {
             _logId = logId;
             return this;
         }
 
-        public LoggerConfiguration WithOptions(LoggerOptions options)
+        public LoggerConfigurator WithOptions(LoggerOptions options)
         {
             _options = options;
             return this;
