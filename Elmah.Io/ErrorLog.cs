@@ -48,13 +48,12 @@ namespace Elmah.Io
 
             var logId = ResolveLogId(config);
             var url = ResolveUrl(config);
-            var durable = ResolveDurable(config);
             ApplicationName = ResolveApplicationName(config);
 
             Client =
                 new LoggerConfiguration()
                     .UseLog(logId)
-                    .WithOptions(new LoggerOptions {Durable = durable, Url = url})
+                    .WithOptions(new LoggerOptions {Url = url})
                     .CreateLogger();
         }
 
@@ -193,17 +192,6 @@ namespace Elmah.Io
         private string ResolveApplicationName(IDictionary config)
         {
             return config.Contains("applicationName") ? config["applicationName"].ToString() : string.Empty;
-        }
-
-        private bool ResolveDurable(IDictionary config)
-        {
-            if (!config.Contains("Durable"))
-            {
-                return false;
-            }
-
-            bool durable;
-            return bool.TryParse(config["Durable"].ToString(), out durable) && durable;
         }
 
         private Uri ResolveUrl(IDictionary config)
