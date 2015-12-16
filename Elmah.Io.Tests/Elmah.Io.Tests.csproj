@@ -39,9 +39,9 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\Moq.4.2.1409.1722\lib\net40\Moq.dll</HintPath>
     </Reference>
-    <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\Newtonsoft.Json.6.0.8\lib\net45\Newtonsoft.Json.dll</HintPath>
+    <Reference Include="Newtonsoft.Json, Version=7.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.7.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="nunit.framework, Version=2.6.4.14350, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -52,6 +52,7 @@
       <HintPath>..\packages\AutoFixture.3.22.0\lib\net40\Ploeh.AutoFixture.dll</HintPath>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
     <Reference Include="System.Web" />
     <Reference Include="System.Xml.Linq" />
@@ -74,11 +75,11 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Elmah.Io.Client\Elmah.Io.Client.csproj">
-      <Project>{52B1D9EE-787C-4F42-ACCC-9A46F365CFD5}</Project>
+      <Project>{d2aee6a8-014a-4412-8c82-2246c863c732}</Project>
       <Name>Elmah.Io.Client</Name>
     </ProjectReference>
     <ProjectReference Include="..\Elmah.Io\Elmah.Io.csproj">
-      <Project>{F74F4E5F-BCEF-4C85-B0AF-6A0AEB207D10}</Project>
+      <Project>{f74f4e5f-bcef-4c85-b0af-6a0aeb207d10}</Project>
       <Name>Elmah.Io</Name>
     </ProjectReference>
   </ItemGroup>

@@ -4,14 +4,15 @@ namespace Elmah.Io.Client
 {
     public class FailEventArgs : EventArgs
     {
-        public FailEventArgs(Message message, Exception error)
+        public FailEventArgs(Message message, string reason, Exception exception)
         {
             Message = message;
-            Error = error;
+            Reason = reason;
+            Exception = exception;
         }
 
         public Message Message { get; set; }
-
-        public Exception Error { get; set; }
+        public string Reason { get; set; }
+        public Exception Exception { get; set; }
     }
 }

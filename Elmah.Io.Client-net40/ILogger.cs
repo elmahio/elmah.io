@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Threading.Tasks;
 
 namespace Elmah.Io.Client
 {
@@ -23,53 +22,47 @@ namespace Elmah.Io.Client
         /// <summary>
         /// Write a log message using the specified Message. The message encapsulates the data included in properties.
         /// </summary>
-        Uri Log(Message message);
+        string Log(Message message);
 
-        Task<Uri> LogAsync(Message message, AsyncCallback asyncCallback, object asyncState);
+        /// <summary>
+        /// Async write a log message using the specified Message. The message encapsulates the data included in properties.
+        /// </summary>
+        IAsyncResult BeginLog(Message message, AsyncCallback asyncCallback, object asyncState);
 
-        ///// <summary>
-        ///// Async write a log message using the specified Message. The message encapsulates the data included in properties.
-        ///// </summary>
-        //IAsyncResult BeginLog(Message message, AsyncCallback asyncCallback, object asyncState);
-
-        ///// <summary>
-        ///// Async end of writing a log message.
-        ///// </summary>
-        //string EndLog(IAsyncResult asyncResult);
+        /// <summary>
+        /// Async end of writing a log message.
+        /// </summary>
+        string EndLog(IAsyncResult asyncResult);
 
         /// <summary>
         /// Gets a log message by its ID.
         /// </summary>
         Message GetMessage(string id);
 
-        Task<Message> GetMessageAsync(string id, AsyncCallback asyncCallback, object asyncState);
+        /// <summary>
+        /// Async gets a log message by its ID.
+        /// </summary>
+        IAsyncResult BeginGetMessage(string id, AsyncCallback asyncCallback, object asyncState);
 
-        ///// <summary>
-        ///// Async gets a log message by its ID.
-        ///// </summary>
-        //IAsyncResult BeginGetMessage(string id, AsyncCallback asyncCallback, object asyncState);
-
-        ///// <summary>
-        ///// Async end of get log message.
-        ///// </summary>
-        //Message EndGetMessage(IAsyncResult asyncResult);
+        /// <summary>
+        /// Async end of get log message.
+        /// </summary>
+        Message EndGetMessage(IAsyncResult asyncResult);
 
         /// <summary>
         /// Get all messages in the specified page and in the page size.
         /// </summary>
         MessagesResult GetMessages(int pageIndex, int pageSize);
 
-        Task<MessagesResult> GetMessagesAsync(int pageIndex, int pageSize, AsyncCallback asyncCallback, object asyncState);
+        /// <summary>
+        /// Async get all messages in the specified page and in the page size.
+        /// </summary>
+        IAsyncResult BeginGetMessages(int pageIndex, int pageSize, AsyncCallback asyncCallback, object asyncState);
 
-        ///// <summary>
-        ///// Async get all messages in the specified page and in the page size.
-        ///// </summary>
-        //IAsyncResult BeginGetMessages(int pageIndex, int pageSize, AsyncCallback asyncCallback, object asyncState);
-
-        ///// <summary>
-        ///// Async end of getting all messages.
-        ///// </summary>
-        //MessagesResult EndGetMessages(IAsyncResult asyncResult);
+        /// <summary>
+        /// Async end of getting all messages.
+        /// </summary>
+        MessagesResult EndGetMessages(IAsyncResult asyncResult);
 
         /// <summary>
         /// Write a log message with the Verbose severity.

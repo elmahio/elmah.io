@@ -5,7 +5,6 @@ using System.Configuration;
 using System.Linq;
 using System.Threading.Tasks;
 using Elmah.Io.Client;
-using Mannex.Threading.Tasks;
 
 namespace Elmah.Io
 {
@@ -47,18 +46,11 @@ namespace Elmah.Io
                     "Missing LogId or LogIdKey. Please specify a LogId in your web.config like this: <errorLog type=\"Elmah.Io.ErrorLog, Elmah.Io\" LogId=\"98895825-2516-43DE-B514-FFB39EA89A65\" /> or using AppSettings: <errorLog type=\"Elmah.Io.ErrorLog, Elmah.Io\" LogIdKey=\"MyAppSettingsKey\" /> where MyAppSettingsKey points to a AppSettings with the key 'MyAPpSettingsKey' and value equal LogId.");
             }
 
-            if (!config.Contains("ApiKey"))
-            {
-                throw new ApplicationException(
-                    "Missing API key. Please specify an API key in your web.config like this: <errorLog type=\"Elmah.Io.ErrorLog, Elmah.Io\" LogId=\"98895825-2516-43DE-B514-FFB39EA89A65\" ApiKey=\"1953A41B9E5A409F831A3A7AC9DD001F\" />.");
-            }
-
             var logId = ResolveLogId(config);
             var url = ResolveUrl(config);
-            var apiKey = ResolveApiKey(config);
             ApplicationName = ResolveApplicationName(config);
 
-            Client = new Logger(logId, apiKey, url);
+            Client = new Logger(logId, url);
         }
 
         public override string Log(Error error)
@@ -74,14 +66,10 @@ namespace Elmah.Io
                 Cookies = error.Cookies.AllKeys.Select(key => new Item {Key = key, Value = error.Cookies[key]}).ToList(),
                 DateTime = error.Time,
                 Detail = error.Detail,
-                Form = error.Form.AllKeys.Select(key => new Item {Key = key, Value = error.Form[key]}).ToList(),
+                Form = error.Form.AllKeys.Select(key => new Item { Key = key, Value = error.Form[key] }).ToList(),
                 Hostname = error.HostName,
-                QueryString =
-                    error.QueryString.AllKeys.Select(key => new Item {Key = key, Value = error.QueryString[key]})
-                        .ToList(),
-                ServerVariables =
-                    error.ServerVariables.AllKeys.Select(key => new Item {Key = key, Value = error.ServerVariables[key]})
-                        .ToList(),
+                QueryString = error.QueryString.AllKeys.Select(key => new Item { Key = key, Value = error.QueryString[key] }).ToList(),
+                ServerVariables = error.ServerVariables.AllKeys.Select(key => new Item { Key = key, Value = error.ServerVariables[key] }).ToList(),
                 Title = error.Message,
                 Source = error.Source,
                 StatusCode = error.StatusCode,
@@ -90,16 +78,7 @@ namespace Elmah.Io
                 Data = error.Exception.ToDataList(),
             };
 
-            return Client
-                .LogAsync(message, asyncCallback, asyncCallback)
-                .ContinueWith(t =>
-                {
-                    if (t.Result == null) return null;
-                    return (t.Result.Query.TrimStart('?').Split('&').Select(parameter => parameter.Split('='))
-                        .Where(parameterSplitted => parameterSplitted.Length == 2 && parameterSplitted[0] == "id")
-                        .Select(parameterSplitted => parameterSplitted[1]))
-                        .FirstOrDefault();
-                });
+            return Client.BeginLog(message, asyncCallback, asyncState);
         }
 
         public override string EndLog(IAsyncResult asyncResult)
@@ -109,7 +88,7 @@ namespace Elmah.Io
 
         public override IAsyncResult BeginGetError(string id, AsyncCallback asyncCallback, object asyncState)
         {
-            return Client.GetMessageAsync(id, asyncCallback, asyncState);
+            return Client.BeginGetMessage(id, asyncCallback, asyncState);
         }
 
         public override ErrorLogEntry EndGetError(IAsyncResult asyncResult)
@@ -165,7 +144,7 @@ namespace Elmah.Io
 
         public override IAsyncResult BeginGetErrors(int pageIndex, int pageSize, IList errorEntryList, AsyncCallback asyncCallback, object asyncState)
         {
-            return Client.GetMessagesAsync(pageIndex, pageSize, asyncCallback, errorEntryList);
+            return Client.BeginGetMessages(pageIndex, pageSize, asyncCallback, errorEntryList);
         }
 
         public override int EndGetErrors(IAsyncResult asyncResult)
@@ -209,11 +188,6 @@ namespace Elmah.Io
         private string ResolveApplicationName(IDictionary config)
         {
             return config.Contains("applicationName") ? config["applicationName"].ToString() : string.Empty;
-        }
-
-        private string ResolveApiKey(IDictionary config)
-        {
-            return config["ApiKey"].ToString();
         }
 
         private Uri ResolveUrl(IDictionary config)

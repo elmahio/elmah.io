@@ -24,15 +24,15 @@ namespace Elmah.Io.Tests
         public void CanLogError()
         {
             // Arrange
-            var location = _fixture.Create<Uri>();
+            var id = _fixture.Create<string>();
             var logMessage = _fixture.Create<string>();
             Message actualMessage = null;
 
             var loggerMock = new Mock<ILogger>();
             loggerMock
-                .Setup(x => x.LogAsync(It.IsAny<Message>(), It.IsAny<AsyncCallback>(), It.IsAny<object>()))
+                .Setup(x => x.BeginLog(It.IsAny<Message>(), It.IsAny<AsyncCallback>(), It.IsAny<object>()))
                 .Callback<Message, AsyncCallback, object>((message, callback, state) => { actualMessage = message; })
-                .Returns(Task.FromResult(location));
+                .Returns(Task.FromResult(id));
 
             var errorLog = new ErrorLog(loggerMock.Object);
 
@@ -40,7 +40,7 @@ namespace Elmah.Io.Tests
             var result = errorLog.Log(new Error(new System.ApplicationException(logMessage)));
 
             // Assert
-            Assert.That(result, Is.EqualTo(location));
+            Assert.That(result, Is.EqualTo(id));
             Assert.That(actualMessage, Is.Not.Null);
             Assert.That(actualMessage.Title, Is.EqualTo(logMessage));
         }
@@ -54,7 +54,7 @@ namespace Elmah.Io.Tests
 
             var loggerMock = new Mock<ILogger>();
             loggerMock
-                .Setup(x => x.GetMessageAsync(It.IsAny<string>(), It.IsAny<AsyncCallback>(), It.IsAny<object>()))
+                .Setup(x => x.BeginGetMessage(It.IsAny<string>(), It.IsAny<AsyncCallback>(), It.IsAny<object>()))
                 .Returns(Task.FromResult(new Message(logMessage) {Id = id}));
 
             var errorLog = new ErrorLog(loggerMock.Object);
@@ -88,7 +88,7 @@ namespace Elmah.Io.Tests
             var taskCompletionSource = new TaskCompletionSource<MessagesResult>(results);
             taskCompletionSource.SetResult(messages);
             loggerMock
-                .Setup(x => x.GetMessagesAsync(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<AsyncCallback>(), It.IsAny<object>()))
+                .Setup(x => x.BeginGetMessages(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<AsyncCallback>(), It.IsAny<object>()))
                 .Returns(taskCompletionSource.Task);
 
             var errorLog = new ErrorLog(loggerMock.Object);

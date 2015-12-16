@@ -1,11 +1,8 @@
 ﻿using System;
-using System.Collections.Specialized;
-using System.Linq;
-using System.Net;
+using System.Net.Http;
+using System.Text;
 using System.Threading.Tasks;
-using Mannex;
 using Mannex.Threading.Tasks;
-using Mannex.Web;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Serialization;
@@ -18,8 +15,10 @@ namespace Elmah.Io.Client
     public class Logger : ILogger
     {
         private readonly Guid _logId;
-        private readonly Uri _url = new Uri("https://elmah.io/");
-        private readonly IWebClient _webClient;
+        private readonly string _apiKey;
+        private readonly Uri _url = new Uri("https://api.elmah.io/");
+        private readonly TimeSpan _timeout = new TimeSpan(0, 0, 5);
+        private readonly HttpClient _httpClient;
 
         public Guid LogId { get { return _logId; } }
         public Uri Url { get { return _url; } }
@@ -32,31 +31,20 @@ namespace Elmah.Io.Client
         /// Creates a new logger with the specified log ID. The logger is configured to use elmah.io's API.
         /// This is probably the constructor you want to use 99 % of the times.
         /// </summary>
-        public Logger(Guid logId) : this(logId, null)
+        public Logger(Guid logId, string apiKey) : this(logId, apiKey, null)
         {
         }
 
-        /// <summary>
-        /// Creates a new logger with the specified log ID and URL. This constructor is primarily ment for test
-        /// purposes or if you are using a version of the elmah.io API not at its official location.
-        /// </summary>
-        public Logger(Guid logId, Uri url) : this(logId, url, new DotNetWebClientProxy())
-        {
-        }
-
-        internal Logger(Guid logId, Uri url, IWebClient webClient)
+        ///// <summary>
+        ///// Creates a new logger with the specified log ID and URL. This constructor is primarily ment for test
+        ///// purposes or if you are using a version of the elmah.io API not at its official location.
+        ///// </summary>
+        public Logger(Guid logId, string apiKey, Uri url)
         {
             _logId = logId;
+            _apiKey = apiKey;
             if (url != null) _url = url;
-            _webClient = webClient;
-        }
-
-        /// <summary>
-        /// Creates a instance of the logger. Do exactly the same as calling the constructor with a Guid parameter.
-        /// </summary>
-        public static Logger Create(Guid logId)
-        {
-            return new Logger(logId);
+            _httpClient = new HttpClient {BaseAddress = _url, Timeout = _timeout};
         }
 
         public void Verbose(string messageTemplate, params object[] propertyValues)
@@ -131,131 +119,83 @@ namespace Elmah.Io.Client
             Log(message);
         }
 
-        public string Log(Message message)
+        public Uri Log(Message message)
         {
-            return EndLog(BeginLog(message, null, null));
+            var logTask = LogAsync(message, null, null);
+            logTask.Wait();
+            return logTask.Result;
         }
 
-        public IAsyncResult BeginLog(Message message, AsyncCallback asyncCallback, object asyncState)
+        public Task<Uri> LogAsync(Message message, AsyncCallback asyncCallback, object asyncState)
         {
             if (message.DateTime == DateTime.MinValue) message.DateTime = DateTime.UtcNow;
             if (OnMessage != null) OnMessage(this, new MessageEventArgs(message));
 
-            var headers = new WebHeaderCollection { { HttpRequestHeader.ContentType, "application/json" } };
-
-            var jsonSerializerSettings = new JsonSerializerSettings {ContractResolver = new CamelCasePropertyNamesContractResolver()};
+            var jsonSerializerSettings = new JsonSerializerSettings { ContractResolver = new CamelCasePropertyNamesContractResolver() };
             jsonSerializerSettings.Converters.Add(new StringEnumConverter());
             var json = JsonConvert.SerializeObject(message, jsonSerializerSettings);
 
-            return _webClient.Post(headers, ApiUrl(), json)
-                             .ContinueWith(t =>
-                             {
-                                 if (t.Status != TaskStatus.RanToCompletion)
-                                 {
-                                     if (OnMessageFail != null) OnMessageFail(this, new FailEventArgs(message, t.Exception));
-                                     return null;
-                                 }
+            return _httpClient
+                .PostAsync(string.Format("v3/messages/{0}?api_key={1}", _logId, _apiKey), new StringContent(json, Encoding.UTF8, "application/json"))
+                .ContinueWith(t =>
+                {
+                    if (t.Status != TaskStatus.RanToCompletion || !t.Result.IsSuccessStatusCode)
+                    {
+                        if (OnMessageFail != null) OnMessageFail(this, new FailEventArgs(message, t.Result.ReasonPhrase, t.Exception));
+                        return null;
+                    }
 
-                                 Uri location;
-                                 if (!Uri.TryCreate(t.Result, UriKind.Absolute, out location))
-                                 {
-                                     return null;
-                                 }
-
-                                 return (location.Query.TrimStart('?').Split('&').Select(parameter => parameter.Split('='))
-                                     .Where(parameterSplitted => parameterSplitted.Length == 2 && parameterSplitted[0] == "id")
-                                     .Select(parameterSplitted => parameterSplitted[1]))
-                                     .FirstOrDefault();
-                             })
-                             .Apmize(asyncCallback, asyncState);
-        }
-
-        public string EndLog(IAsyncResult asyncResult)
-        {
-            return EndImpl<string>(asyncResult);
+                    return t.Result.Headers.Location;
+                })
+                .Apmize(asyncCallback, asyncState);
         }
 
         public Message GetMessage(string id)
         {
-            return EndGetMessage(BeginGetMessage(id, null, null));
+            var getMessageTask = GetMessageAsync(id, null, null);
+            getMessageTask.Wait();
+            return getMessageTask.Result;
         }
 
-        public IAsyncResult BeginGetMessage(string id, AsyncCallback asyncCallback, object asyncState)
+        public Task<Message> GetMessageAsync(string id, AsyncCallback asyncCallback, object asyncState)
         {
-            return _webClient.Get(ApiUrl(new NameValueCollection { { "id", id } }))
-                             .ContinueWith(t =>
-                             {
-                                 if (t.Status != TaskStatus.RanToCompletion)
-                                 {
-                                     return null;
-                                 }
+            return _httpClient
+                .GetAsync(string.Format("v3/messages/{0}/{1}?api_key={2}", _logId, id, _apiKey))
+                .ContinueWith(t =>
+                {
+                    if (t.Status != TaskStatus.RanToCompletion || !t.Result.IsSuccessStatusCode)
+                    {
+                        return null;
+                    }
 
-                                 var message = JsonConvert.DeserializeObject<Message>(t.Result);
-                                 return message;
-                             })
-                             .Apmize(asyncCallback, asyncState);
-        }
-
-        public Message EndGetMessage(IAsyncResult asyncResult)
-        {
-            return EndImpl<Message>(asyncResult);
+                    var message = JsonConvert.DeserializeObject<Message>(t.Result.Content.ReadAsStringAsync().Result);
+                    return message;
+                })
+                .Apmize(asyncCallback, asyncState);
         }
 
         public MessagesResult GetMessages(int pageIndex, int pageSize)
         {
-            return EndGetMessages(BeginGetMessages(pageIndex, pageSize, null, null));
+            var getMessagesTask = GetMessagesAsync(pageIndex, pageSize, null, null);
+            getMessagesTask.Wait();
+            return getMessagesTask.Result;
         }
 
-        public IAsyncResult BeginGetMessages(int pageIndex, int pageSize, AsyncCallback asyncCallback, object asyncState)
+        public Task<MessagesResult> GetMessagesAsync(int pageIndex, int pageSize, AsyncCallback asyncCallback, object asyncState)
         {
-            var url = ApiUrl(new NameValueCollection
-            {
-                { "pageindex", pageIndex.ToInvariantString() }, 
-                { "pagesize", pageSize.ToInvariantString() }, 
-            });
-
-            return _webClient.Get(url).ContinueWith(t =>
-            {
-                if (t.Status != TaskStatus.RanToCompletion)
+            return _httpClient
+                .GetAsync(string.Format("v3/messages/{0}?pageindex={1}&pagesize={2}&api_key={3}", _logId, pageIndex, pageSize, _apiKey))
+                .ContinueWith(t =>
                 {
-                    return null;
-                }
+                    if (t.Status != TaskStatus.RanToCompletion || !t.Result.IsSuccessStatusCode)
+                    {
+                        return null;
+                    }
 
-                var messagesResult = JsonConvert.DeserializeObject<MessagesResult>(t.Result);
-
-                return messagesResult;
-            }).Apmize(asyncCallback, asyncState);
-        }
-
-        public MessagesResult EndGetMessages(IAsyncResult asyncResult)
-        {
-            return EndImpl<MessagesResult>(asyncResult);
-        }
-
-        private T EndImpl<T>(IAsyncResult asyncResult)
-        {
-            if (asyncResult == null)
-            {
-                throw new ArgumentNullException("asyncResult");
-            }
-
-            var task = asyncResult as Task<T>;
-            if (task == null)
-            {
-                throw new ArgumentException(null, "asyncResult");
-            }
-
-            return task.Result;
-        }
-
-        private Uri ApiUrl(NameValueCollection query = null)
-        {
-            var q = new NameValueCollection
-            {
-                { "logId", _logId.ToString() }, 
-                query ?? new NameValueCollection()
-            };
-            return new Uri(_url, "api/v2/messages" + q.ToQueryString());
+                    var messages = JsonConvert.DeserializeObject<MessagesResult>(t.Result.Content.ReadAsStringAsync().Result);
+                    return messages;
+                })
+                .Apmize(asyncCallback, asyncState);
         }
     }
 }

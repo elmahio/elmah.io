@@ -1,12 +1,7 @@
 ﻿using System;
-using System.Globalization;
 using System.Linq;
-using System.Net;
-using System.Text;
-using System.Threading.Tasks;
+using System.Threading;
 using Elmah.Io.Client;
-using Moq;
-using Newtonsoft.Json.Converters;
 using NUnit.Framework;
 using Ploeh.AutoFixture;
 
@@ -15,150 +10,96 @@ namespace Elmah.Io.Tests
     public class LoggerTest
     {
         private Fixture _fixture;
+        private string _apiKey;
 
         [SetUp]
         public void SetUp()
         {
             _fixture = new Fixture();
+            _apiKey = Environment.GetEnvironmentVariable("ELMAH_IO_API_KEY", EnvironmentVariableTarget.User);
         }
 
         [Test]
         public void CanLogMessage()
         {
             // Arrange
-            var id = _fixture.Create<int>().ToString(CultureInfo.InvariantCulture);
-            var logId = _fixture.Create<Guid>();
-            Uri actualUri = null;
-            string actualData = null;
-
-            var requestHeaders = new WebHeaderCollection();
-            var webClientMock = new Mock<IWebClient>();
-            webClientMock
-                .Setup(x => x.Post(It.IsAny<WebHeaderCollection>(), It.IsAny<Uri>(), It.IsAny<string>(), It.IsAny<Func<WebHeaderCollection, string, string>>()))
-                .Callback<WebHeaderCollection, Uri, string, Func<WebHeaderCollection, string, string>>((headers, uri, data, resultor) => { requestHeaders = headers; actualUri = uri; actualData = data; })
-                .Returns(Task.FromResult("https://elmah.io/api/v2/messages?id=" + id + "&logid=" + logId));
-
-            var logger = new Logger(logId, null, webClientMock.Object);
+            var logger = new Logger(new Guid("494cd9d0-3fab-4412-913b-2b2aa109dff5"), _apiKey);
             var message = _fixture.Create<Message>();
 
             // Act
             var result = logger.Log(message);
 
             // Assert
-            Assert.That(result, Is.EqualTo(id));
-            Assert.That(requestHeaders[HttpRequestHeader.ContentType], Is.EqualTo("application/json"));
-            Assert.That(actualUri.AbsoluteUri, Is.Not.Null.And.StringEnding(string.Format("api/v2/messages?logId={0}", logId)));
-            Assert.That(actualData, Is.Not.Null);
-            Assert.That(actualData, Is.StringContaining(message.Title));
-            Assert.That(actualData, Is.StringContaining(message.Severity.ToString()));
+            Assert.That(result, Is.Not.Null.And.Not.Empty);
         }
 
         [Test]
         public void CanLogMessageThroughHelpers()
         {
             // Arrange
-            var logId = _fixture.Create<Guid>();
-            string actualData = null;
-
-            var webClientMock = new Mock<IWebClient>();
-            webClientMock
-                .Setup(x => x.Post(It.IsAny<WebHeaderCollection>(), It.IsAny<Uri>(), It.IsAny<string>(), It.IsAny<Func<WebHeaderCollection, string, string>>()))
-                .Callback<WebHeaderCollection, Uri, string, Func<WebHeaderCollection, string, string>>((headers, uri, data, resultor) => { actualData = data; })
-                .Returns(Task.FromResult(string.Empty));
-
-            var logger = new Logger(logId, null, webClientMock.Object);
-
-            var utcDate = DateTime.UtcNow.ToString("yyyy-MM-dd");
+            var logger = new Logger(new Guid("494cd9d0-3fab-4412-913b-2b2aa109dff5"), _apiKey);
             var value = _fixture.Create<string>();
 
             // Act
             logger.Verbose("{0}", value);
 
             // Assert
-            Assert.That(actualData, Is.Not.Null);
-            Assert.That(actualData, Is.StringContaining(value));
-            Assert.That(actualData, Is.StringContaining(Severity.Verbose.ToString()));
-            Assert.That(actualData, Is.StringContaining(utcDate));
         }
 
         [Test]
         public void CanGetMessage()
         {
             // Arrange
-            var id = _fixture.Create<string>();
-            var logId = _fixture.Create<Guid>();
+            var logger = new Logger(new Guid("494cd9d0-3fab-4412-913b-2b2aa109dff5"), _apiKey);
             var message = _fixture.Create<Message>();
-            Uri actualUri = null;
+            var location = logger.Log(message);
 
-            var webClientMock = new Mock<IWebClient>();
-            webClientMock
-                .Setup(x => x.Get(It.IsAny<WebHeaderCollection>(), It.IsAny<Uri>(), It.IsAny<Func<WebHeaderCollection, string, string>>()))
-                .Callback<WebHeaderCollection, Uri, Func<WebHeaderCollection, string, string>>((headers, uri, resultor) => { actualUri = uri; })
-                .Returns(Task.FromResult("{title: \"" + message.Title + "\"}"));
+            Thread.Sleep(10000);
 
-            var logger = new Logger(logId, null, webClientMock.Object);
+            var id = location.Query.TrimStart('?').Split('&').Select(parameter => parameter.Split('='))
+                        .Where(parameterSplitted => parameterSplitted.Length == 2 && parameterSplitted[0] == "id")
+                        .Select(parameterSplitted => parameterSplitted[1])
+                        .FirstOrDefault();
 
             // Act
             var result = logger.GetMessage(id);
 
             // Assert
             Assert.That(result, Is.Not.Null);
-            Assert.That(actualUri.AbsoluteUri, Is.Not.Null.And.StringEnding(string.Format("api/v2/messages?logId={1}&id={0}", id, logId)));
             Assert.That(result.Title, Is.EqualTo(message.Title));
         }
 
+
+
         [Test]
-        public void CanGetErrors()
+        public void CanGetMessages()
         {
             // Arrange
-            var pageIndex = _fixture.Create<int>();
-            var pageSize = _fixture.Create<int>();
-            var logId = _fixture.Create<Guid>();
-            var messages = _fixture.Create<MessagesResult>();
-            Uri actualUri = null;
-
-            var webClientMock = new Mock<IWebClient>();
-            var buildJson = BuildJson(messages);
-            webClientMock
-                .Setup(x => x.Get(It.IsAny<WebHeaderCollection>(), It.IsAny<Uri>(), It.IsAny<Func<WebHeaderCollection, string, string>>()))
-                .Callback<WebHeaderCollection, Uri, Func<WebHeaderCollection, string, string>>((headers, uri, resultor) => { actualUri = uri; })
-                .Returns(Task.FromResult(buildJson));
-
-            var logger = new Logger(logId, null, webClientMock.Object);
+            var logger = new Logger(new Guid("494cd9d0-3fab-4412-913b-2b2aa109dff5"), _apiKey);
+            var message = _fixture.Create<Message>();
+            logger.Log(message);
+            logger.Log(message);
 
             // Act
-            var result = logger.GetMessages(pageIndex, pageSize);
+            var result = logger.GetMessages(0, 10);
 
             // Assert
-            Assert.That(actualUri.AbsoluteUri, Is.Not.Null.And.StringEnding(string.Format("api/v2/messages?logId={0}&pageindex={1}&pagesize={2}", logId, pageIndex, pageSize)));
-            Assert.That(result.Total, Is.EqualTo(messages.Total));
-            Assert.That(result.Messages, Is.Not.Null);
-            Assert.That(result.Messages.Count, Is.EqualTo(messages.Messages.Count));
-            messages.Messages.ForEach(message => Assert.That(result.Messages.Any(msg => msg.Title == message.Title)));
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result.Messages.Count, Is.AtLeast(2));
         }
 
         [Test]
         public void CanRegisterForMessageFailEvent()
         {
             // Arrange
-            var logId = _fixture.Create<Guid>();
-            var webClientMock = new Mock<IWebClient>();
-            webClientMock
-                .Setup(x => x.Post(It.IsAny<WebHeaderCollection>(), It.IsAny<Uri>(), It.IsAny<string>(), It.IsAny<Func<WebHeaderCollection, string, string>>()))
-                .Returns(Task.Factory.StartNew<string>(() =>
-                {
-                    throw new System.ApplicationException("Some shit happened");
-                }));
-            var logger = new Logger(logId, null, webClientMock.Object);
-
+            var logger = new Logger(new Guid("494cd9d0-3fab-4412-913b-2b2aa109dff5"), _apiKey, new Uri("http://localhost"));
             var eventHandlerWasCalled = false;
-            Exception exception = null;
+            string reason = null;
             Message message = null;
-
             logger.OnMessageFail += (sender, args) =>
             {
                 eventHandlerWasCalled = true;
-                exception = args.Error;
+                reason = args.Reason;
                 message = args.Message;
             };
 
@@ -167,7 +108,7 @@ namespace Elmah.Io.Tests
 
             // Assert
             Assert.That(eventHandlerWasCalled);
-            Assert.That(exception, Is.Not.Null);
+            Assert.That(reason, Is.Not.Null);
             Assert.That(message, Is.Not.Null);
         }
 
@@ -175,9 +116,7 @@ namespace Elmah.Io.Tests
         public void CanRegisterForMessageEvent()
         {
             // Arrange
-            var logId = _fixture.Create<Guid>();
-            var webClientMock = new Mock<IWebClient>();
-            var logger = new Logger(logId, null, webClientMock.Object);
+            var logger = new Logger(new Guid("494cd9d0-3fab-4412-913b-2b2aa109dff5"), _apiKey);
 
             var eventHandlerWasCalled = false;
             Message message = null;
@@ -194,21 +133,6 @@ namespace Elmah.Io.Tests
             // Assert
             Assert.That(eventHandlerWasCalled);
             Assert.That(message, Is.Not.Null);
-        }
-
-        private string BuildJson(MessagesResult messages)
-        {
-            var jsonBuilder = new StringBuilder();
-            jsonBuilder.Append("{total: ").Append(messages.Total).Append(", messages: [");
-            var first = true;
-            foreach (var message in messages.Messages)
-            {
-                if (!first) jsonBuilder.Append(",");
-                first = false;
-                jsonBuilder.Append("{title: \"").Append(message.Title).Append("\"}");
-            }
-            jsonBuilder.Append("]}");
-            return jsonBuilder.ToString();
         }
     }
 }
