@@ -22,7 +22,7 @@ namespace Elmah.Io.Tests
         {
             // Arrange
             var configUri = _fixture.Create<Uri>();
-            var errorLog = new ErrorLog(new Hashtable { { "LogId", _fixture.Create<Guid>().ToString() }, { "Url", configUri } });
+            var errorLog = new ErrorLog(new Hashtable { { "LogId", _fixture.Create<Guid>().ToString() }, { "Url", configUri }, {"ApiKey", _fixture.Create<string>()} });
 
             // Act
             errorLog.Log(new Error(new System.ApplicationException()));

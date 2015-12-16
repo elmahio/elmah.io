@@ -24,7 +24,7 @@ namespace Elmah.Io.Tests
         public void CanLogError()
         {
             // Arrange
-            var location = _fixture.Create<Uri>();
+            var location = new Uri("https://api.elmah.io/v3/messages/4D4070FA-2BD7-42F3-9B21-714CCF9442C3/42");
             var logMessage = _fixture.Create<string>();
             Message actualMessage = null;
 
