@@ -16,7 +16,7 @@ namespace Elmah.Io.Tests
         public void SetUp()
         {
             _fixture = new Fixture();
-            _apiKey = Environment.GetEnvironmentVariable("ELMAH_IO_API_KEY", EnvironmentVariableTarget.User);
+            _apiKey = Environment.GetEnvironmentVariable("ELMAH_IO_API_KEY", EnvironmentVariableTarget.Machine);
         }
 
         [Test]
