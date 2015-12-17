@@ -30,7 +30,7 @@ namespace Elmah.Io.Tests
             var result = logger.Log(message);
 
             // Assert
-            Assert.That(result, Is.Not.Null.And.Not.Empty);
+            Assert.That(result, Is.Not.Null);
         }
 
         [Test]
@@ -56,10 +56,7 @@ namespace Elmah.Io.Tests
 
             Thread.Sleep(10000);
 
-            var id = location.Query.TrimStart('?').Split('&').Select(parameter => parameter.Split('='))
-                        .Where(parameterSplitted => parameterSplitted.Length == 2 && parameterSplitted[0] == "id")
-                        .Select(parameterSplitted => parameterSplitted[1])
-                        .FirstOrDefault();
+            var id = location.AbsoluteUri.Substring(location.AbsoluteUri.LastIndexOf("/") + 1);
 
             // Act
             var result = logger.GetMessage(id);

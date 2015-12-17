@@ -40,7 +40,7 @@ namespace Elmah.Io.Tests
             var result = errorLog.Log(new Error(new System.ApplicationException(logMessage)));
 
             // Assert
-            Assert.That(result, Is.EqualTo(location));
+            Assert.That(result, Is.EqualTo("42"));
             Assert.That(actualMessage, Is.Not.Null);
             Assert.That(actualMessage.Title, Is.EqualTo(logMessage));
         }

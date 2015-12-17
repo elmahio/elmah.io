@@ -95,10 +95,7 @@ namespace Elmah.Io
                 .ContinueWith(t =>
                 {
                     if (t.Result == null) return null;
-                    return (t.Result.Query.TrimStart('?').Split('&').Select(parameter => parameter.Split('='))
-                        .Where(parameterSplitted => parameterSplitted.Length == 2 && parameterSplitted[0] == "id")
-                        .Select(parameterSplitted => parameterSplitted[1]))
-                        .FirstOrDefault();
+                    return t.Result.AbsoluteUri.Substring(t.Result.AbsoluteUri.LastIndexOf("/") + 1);
                 });
         }
 
