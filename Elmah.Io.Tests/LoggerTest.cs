@@ -7,6 +7,7 @@ using Ploeh.AutoFixture;
 
 namespace Elmah.Io.Tests
 {
+    [Ignore("Requires API key to run")]
     public class LoggerTest
     {
         private Fixture _fixture;
@@ -16,7 +17,7 @@ namespace Elmah.Io.Tests
         public void SetUp()
         {
             _fixture = new Fixture();
-            _apiKey = Environment.GetEnvironmentVariable("ELMAH_IO_API_KEY", EnvironmentVariableTarget.Machine);
+            _apiKey = Environment.GetEnvironmentVariable("ELMAH_IO_API_KEY", EnvironmentVariableTarget.User);
         }
 
         [Test]
