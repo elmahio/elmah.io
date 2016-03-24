@@ -34,6 +34,8 @@ namespace Elmah.Io.Client
 
         public string Url { get; set; }
 
+        public string Version { get; set; }
+
         public List<Item> Cookies { get; set; }
 
         public List<Item> Form { get; set; }
