@@ -5,7 +5,7 @@
     <authors>elmah.io</authors>
     <owners />
     <dependencies>
-      <dependency id="elmah.io.core" />
+      <dependency id="elmah.io.core" version="$version$" />
     </dependencies>
     <id>elmah.io</id>
     <title>elmah.io</title>
