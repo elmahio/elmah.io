@@ -10,6 +10,7 @@
     <description>Raw client for sending and receiving message to and from elmah.io. This package is not dependant of ELMAH and can be used to integrate to elmah.io from another logging framework or similar.</description>
     <projectUrl>https://github.com/elmahio/elmah.io</projectUrl>
     <iconUrl>https://secure.gravatar.com/avatar/5c4cb3646528821117abde6d2d5ee22d?s=32</iconUrl>
+	<tags>Error Exception Reporing Management Logging ELMAH Diagnostics Tracing</tags>
   </metadata>
   <files>
     <file src="Elmah.Io.Client\bin\$Configuration$\Elmah.Io.Client.dll" target="lib\net40\Elmah.Io.Client.dll" />
