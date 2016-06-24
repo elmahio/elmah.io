@@ -5,7 +5,7 @@
     <authors>elmah.io</authors>
     <owners />
     <dependencies>
-      <dependency id="elmah.io.core" />
+      <dependency id="elmah.io.core" version="$version$" />
     </dependencies>
     <id>elmah.io</id>
     <title>elmah.io</title>
@@ -14,6 +14,7 @@
     <description>ELMAH error logger for sending errors to elmah.io. This package include initial configuration for getting up and running with elmah.io. If you have just started using elmah.io or didn't change any of the ELMAH configuration, this package is the right choice for you. If you want more control of the config you should install the elmah.io.core package and configure elmah.io manually (see https://github.com/elmahio/Elmah.Io.Examples/blob/master/Elmah.Io.Examples.WebSite/Web.config).</description>
     <projectUrl>https://github.com/elmahio/elmah.io</projectUrl>
     <iconUrl>https://secure.gravatar.com/avatar/5c4cb3646528821117abde6d2d5ee22d?s=32</iconUrl>
+	<tags>Error Exception Reporing Management Logging ELMAH Diagnostics Tracing</tags>
   </metadata>
   <files>
     <file src="Elmah.Io\NuGet\content\web.config.transform" target="content\web.config.transform" />
