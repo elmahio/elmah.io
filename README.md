@@ -1,6 +1,9 @@
 elmah.io
 ======
 
+[![Build status](http://teamcity.codebetter.com/app/rest/builds/buildType:ElmahIo_ElmahIoV2/statusIcon)](http://teamcity.codebetter.com/viewType.html?buildTypeId=ElmahIo_ElmahIoV2)
+[![NuGet](https://img.shields.io/nuget/vpre/elmah.io.svg)](https://www.nuget.org/packages/elmah.io)
+
 ELMAH error logger for sending errors to elmah.io.
 
 Getting started
