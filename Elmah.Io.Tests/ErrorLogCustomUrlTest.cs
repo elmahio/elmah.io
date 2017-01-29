@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections;
-using Elmah.Io.Client;
 using NUnit.Framework;
 using Ploeh.AutoFixture;
 
@@ -22,15 +21,19 @@ namespace Elmah.Io.Tests
         {
             // Arrange
             var configUri = _fixture.Create<Uri>();
-            var errorLog = new ErrorLog(new Hashtable { { "LogId", _fixture.Create<Guid>().ToString() }, { "Url", configUri } });
+            var errorLog =
+                new ErrorLog(new Hashtable
+                {
+                    {"logId", _fixture.Create<Guid>().ToString()},
+                    {"apiKey", "MyKey"},
+                    {"url", configUri.ToString()}
+                });
 
             // Act
-            errorLog.Log(new Error(new System.ApplicationException()));
+            var uri = ErrorLog.Client.BaseUri;
 
             // Assert
-            var client = ErrorLog.Client as Logger;
-            Assert.That(client != null);
-            Assert.That(client.Url, Is.EqualTo(configUri));
+            Assert.That(uri, Is.EqualTo(configUri));
         }
     }
 }

@@ -1,8 +1,11 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using Elmah.Io.Client;
+using Elmah.Io.Client.Models;
+using Microsoft.Rest;
 using Moq;
 using NUnit.Framework;
 using Ploeh.AutoFixture;
@@ -12,12 +15,18 @@ namespace Elmah.Io.Tests
     public class ErrorLogCoreElmahMethodsTest
     {
         private Fixture _fixture;
+        private ErrorLog _errorLog;
+        Mock<IMessages> _messagesMock;
 
         [SetUp]
         public void SetUp()
         {
             _fixture = new Fixture();
             ErrorLog.Client = null;
+            var clientMock = new Mock<IElmahioAPI>();
+            _messagesMock = new Mock<IMessages>();
+            clientMock.Setup(x => x.Messages).Returns(_messagesMock.Object);
+            _errorLog = new ErrorLog(clientMock.Object);
         }
 
         [Test]
@@ -26,18 +35,15 @@ namespace Elmah.Io.Tests
             // Arrange
             var id = _fixture.Create<string>();
             var logMessage = _fixture.Create<string>();
-            Message actualMessage = null;
+            CreateMessage actualMessage = null;
 
-            var loggerMock = new Mock<ILogger>();
-            loggerMock
-                .Setup(x => x.BeginLog(It.IsAny<Message>(), It.IsAny<AsyncCallback>(), It.IsAny<object>()))
-                .Callback<Message, AsyncCallback, object>((message, callback, state) => { actualMessage = message; })
-                .Returns(Task.FromResult(id));
-
-            var errorLog = new ErrorLog(loggerMock.Object);
+            _messagesMock
+                .Setup(x => x.CreateAndNotifyAsync(It.IsAny<Guid>(), It.IsAny<CreateMessage>()))
+                .Callback<Guid, CreateMessage>((logId, msg) => { actualMessage = msg; })
+                .Returns(Task.FromResult(new Message {Id = id}));
 
             // Act
-            var result = errorLog.Log(new Error(new System.ApplicationException(logMessage)));
+            var result = _errorLog.Log(new Error(new System.ApplicationException(logMessage)));
 
             // Assert
             Assert.That(result, Is.EqualTo(id));
@@ -52,15 +58,12 @@ namespace Elmah.Io.Tests
             var id = _fixture.Create<string>();
             var logMessage = _fixture.Create<string>();
 
-            var loggerMock = new Mock<ILogger>();
-            loggerMock
-                .Setup(x => x.BeginGetMessage(It.IsAny<string>(), It.IsAny<AsyncCallback>(), It.IsAny<object>()))
-                .Returns(Task.FromResult(new Message(logMessage) {Id = id}));
-
-            var errorLog = new ErrorLog(loggerMock.Object);
+            _messagesMock
+                .Setup(x => x.GetWithHttpMessagesAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Dictionary<string, List<string>>>(), It.IsAny<CancellationToken>()))
+                .Returns(Task.FromResult(new HttpOperationResponse<Message> {Body = new Message { Id = id, Title = logMessage, DateTime = DateTime.UtcNow }}));
 
             // Act
-            var result = errorLog.GetError(id);
+            var result = _errorLog.GetError(id);
 
             // Assert
             Assert.That(result, Is.Not.Null);
@@ -72,29 +75,28 @@ namespace Elmah.Io.Tests
         public void CanGetErrors()
         {
             // Arrange
-            var message1 = _fixture.Create<Message>();
-            var message2 = _fixture.Create<Message>();
+            var message1 = _fixture.Create<MessageOverview>();
+            var message2 = _fixture.Create<MessageOverview>();
             var pageIndex = _fixture.Create<int>();
             var pageSize = _fixture.Create<int>();
-            var messages = new MessagesResult()
+            var messages = new MessagesResult
             {
                 Total = 3,
-                Messages = new List<Message> { message1, message2, }
+                Messages = new List<MessageOverview> { message1, message2, }
             };
             var results = new ArrayList();
 
-            var loggerMock = new Mock<ILogger>();
-
-            var taskCompletionSource = new TaskCompletionSource<MessagesResult>(results);
-            taskCompletionSource.SetResult(messages);
-            loggerMock
-                .Setup(x => x.BeginGetMessages(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<AsyncCallback>(), It.IsAny<object>()))
+            var taskCompletionSource = new TaskCompletionSource<HttpOperationResponse<MessagesResult>>(results);
+            taskCompletionSource.SetResult(new HttpOperationResponse<MessagesResult> {Body = messages});
+            _messagesMock
+                .Setup(
+                    x =>
+                        x.GetAllWithHttpMessagesAsync(It.IsAny<string>(), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<string>(),
+                            It.IsAny<DateTime?>(), It.IsAny<DateTime?>(), It.IsAny<Dictionary<string,List<string>>>(), It.IsAny<CancellationToken>()))
                 .Returns(taskCompletionSource.Task);
 
-            var errorLog = new ErrorLog(loggerMock.Object);
-
             // Act
-            var count = errorLog.GetErrors(pageIndex, pageSize, results);
+            var count = _errorLog.GetErrors(pageIndex, pageSize, results);
 
             // Assert
             Assert.That(count, Is.EqualTo(3));

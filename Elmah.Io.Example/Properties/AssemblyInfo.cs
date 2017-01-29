@@ -5,12 +5,12 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("Elmah.Io.Client")]
-[assembly: AssemblyDescription(".NET client for communicating with the elmah.io V2 API")]
+[assembly: AssemblyTitle("Elmah.Io.Example")]
+[assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("elmah.io")]
 [assembly: AssemblyProduct("elmah.io")]
-[assembly: AssemblyCopyright("Copyright © elmah.io 2014")]
+[assembly: AssemblyCopyright("Copyright © elmah.io 2014-2017")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("3f07bd79-1fb2-46f0-b070-f7795467717b")]
+[assembly: Guid("8b60ae1a-5a88-4965-bf65-d630ba95d167")]
 
 // Version information for an assembly consists of the following four values:
 //
@@ -29,9 +29,7 @@ using System.Runtime.InteropServices;
 //      Build Number
 //      Revision
 //
-// You can specify all the values or you can default the Build and Revision Numbers 
+// You can specify all the values or you can default the Revision and Build Numbers 
 // by using the '*' as shown below:
-// [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("2.0.0.0")]
-[assembly: AssemblyFileVersion("2.0.0.0")]
-[assembly: InternalsVisibleTo("Elmah.Io.Tests")]
+[assembly: AssemblyVersion("3.0.0.0")]
+[assembly: AssemblyFileVersion("3.0.0.0")]

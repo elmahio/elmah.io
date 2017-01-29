@@ -1,16 +1,19 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Configuration;
+using System.Collections.Specialized;
 using System.Linq;
 using System.Threading.Tasks;
 using Elmah.Io.Client;
+using Elmah.Io.Client.Models;
 
 namespace Elmah.Io
 {
     public class ErrorLog : Elmah.ErrorLog, IErrorLog
     {
-        public static ILogger Client;
+        public static IElmahioAPI Client;
+
+        private readonly Guid _logId;
 
         /// <summary>
         /// ELMAH doesn't use this constructor and it is only published in order for you to create
@@ -18,7 +21,7 @@ namespace Elmah.Io
         /// you've already created. If you implement your own ILogger, please  identify yourself
         /// using an appropriate user agent.
         /// </summary>
-        public ErrorLog(ILogger logger)
+        public ErrorLog(IElmahioAPI logger)
         {
             Client = logger;
         }
@@ -33,24 +36,25 @@ namespace Elmah.Io
         /// </summary>
         public ErrorLog(IDictionary config)
         {
-            if (Client != null) return;
-            
             if (config == null)
             {
-                throw new ArgumentNullException("config");
+                throw new ArgumentNullException(nameof(config));
             }
 
-            if (!config.Contains("LogId") && !config.Contains("LogIdKey"))
+            _logId = config.LogId();
+            var apiKey = config.ApiKey();
+            ApplicationName = config.ApplicationName();
+
+            if (Client != null) return;
+
+            var url = config.Url();
+            var elmahioApi = ElmahioAPI.Create(apiKey);
+            if (url != null)
             {
-                throw new ApplicationException(
-                    "Missing LogId or LogIdKey. Please specify a LogId in your web.config like this: <errorLog type=\"Elmah.Io.ErrorLog, Elmah.Io\" LogId=\"98895825-2516-43DE-B514-FFB39EA89A65\" /> or using AppSettings: <errorLog type=\"Elmah.Io.ErrorLog, Elmah.Io\" LogIdKey=\"MyAppSettingsKey\" /> where MyAppSettingsKey points to a AppSettings with the key 'MyAPpSettingsKey' and value equal LogId.");
+                elmahioApi.BaseUri = url;
             }
 
-            var logId = ResolveLogId(config);
-            var url = ResolveUrl(config);
-            ApplicationName = ResolveApplicationName(config);
-
-            Client = new Logger(logId, url);
+            Client = elmahioApi;
         }
 
         public override string Log(Error error)
@@ -60,80 +64,51 @@ namespace Elmah.Io
 
         public override IAsyncResult BeginLog(Error error, AsyncCallback asyncCallback, object asyncState)
         {
-            var message = new Message(error.Message)
-            {
-                Application = error.ApplicationName,
-                Cookies = error.Cookies.AllKeys.Select(key => new Item {Key = key, Value = error.Cookies[key]}).ToList(),
-                DateTime = error.Time,
-                Detail = error.Detail,
-                Form = error.Form.AllKeys.Select(key => new Item { Key = key, Value = error.Form[key] }).ToList(),
-                Hostname = error.HostName,
-                QueryString = error.QueryString.AllKeys.Select(key => new Item { Key = key, Value = error.QueryString[key] }).ToList(),
-                ServerVariables = error.ServerVariables.AllKeys.Select(key => new Item { Key = key, Value = error.ServerVariables[key] }).ToList(),
-                Title = error.Message,
-                Source = error.Source,
-                StatusCode = error.StatusCode,
-                Type = error.Type,
-                User = error.User,
-                Data = error.Exception.ToDataList(),
-            };
-
-            return Client.BeginLog(message, asyncCallback, asyncState);
+            var tcs = new TaskCompletionSource<Message>(asyncState);
+            Client
+                .Messages
+                .CreateAndNotifyAsync(_logId, new CreateMessage
+                {
+                    Application = error.ApplicationName,
+                    Cookies = Itemize(error.Cookies),
+                    DateTime = error.Time,
+                    Detail = error.Detail,
+                    Form = Itemize(error.Form),
+                    Hostname = error.HostName,
+                    QueryString = Itemize(error.QueryString),
+                    ServerVariables = Itemize(error.ServerVariables),
+                    Title = error.Message,
+                    Source = error.Source,
+                    StatusCode = error.StatusCode,
+                    Type = error.Type,
+                    User = error.User,
+                    Data = error.Exception.ToDataList(),
+                })
+                .ContinueWith(t => Continue(asyncCallback, t, tcs));
+            return tcs.Task;
         }
 
         public override string EndLog(IAsyncResult asyncResult)
         {
-            return EndImpl<string>(asyncResult);
+            var message = EndImpl<Message>(asyncResult);
+            return message?.Id;
         }
 
         public override IAsyncResult BeginGetError(string id, AsyncCallback asyncCallback, object asyncState)
         {
-            return Client.BeginGetMessage(id, asyncCallback, asyncCallback);
+            var tcs = new TaskCompletionSource<Message>(asyncState);
+            Client
+                .Messages
+                .GetAsync(id, _logId.ToString())
+                .ContinueWith(t => Continue(asyncCallback, t, tcs));
+            return tcs.Task;
         }
 
         public override ErrorLogEntry EndGetError(IAsyncResult asyncResult)
         {
             var message = EndImpl<Message>(asyncResult);
+            if (message == null) return null;
             var errorLogEntry = MapErrorLogEntry(message);
-            return errorLogEntry;
-        }
-
-        private ErrorLogEntry MapErrorLogEntry(Message message)
-        {
-            var error = new Error
-            {
-                ApplicationName = message.Application,
-                Detail = message.Detail,
-                HostName = message.Hostname,
-                Message = message.Title,
-                Source = message.Source,
-                StatusCode = message.StatusCode.HasValue ? message.StatusCode.Value : 0,
-                Time = message.DateTime,
-                Type = message.Type,
-                User = message.User,
-            };
-
-            foreach (var cookie in (message.Cookies ?? new List<Item>()))
-            {
-                error.Cookies.Add(cookie.Key, cookie.Value);
-            }
-
-            foreach (var formElement in (message.Form ?? new List<Item>()))
-            {
-                error.Form.Add(formElement.Key, formElement.Value);
-            }
-
-            foreach (var queryStringItem in (message.QueryString ?? new List<Item>()))
-            {
-                error.QueryString.Add(queryStringItem.Key, queryStringItem.Value);
-            }
-
-            foreach (var serverVariable in (message.ServerVariables ?? new List<Item>()))
-            {
-                error.ServerVariables.Add(serverVariable.Key, serverVariable.Value);
-            }
-
-            var errorLogEntry = new ErrorLogEntry(this, message.Id, error);
             return errorLogEntry;
         }
 
@@ -144,24 +119,28 @@ namespace Elmah.Io
 
         public override IAsyncResult BeginGetErrors(int pageIndex, int pageSize, IList errorEntryList, AsyncCallback asyncCallback, object asyncState)
         {
-            return Client.BeginGetMessages(pageIndex, pageSize, asyncCallback, errorEntryList);
+            var tcs = new TaskCompletionSource<MessagesResult>(errorEntryList);
+            Client
+                .Messages
+                .GetAllAsync(_logId.ToString(), pageIndex, pageSize)
+                .ContinueWith(t => Continue(asyncCallback, t, tcs));
+            return tcs.Task;
         }
 
         public override int EndGetErrors(IAsyncResult asyncResult)
         {
             var messagesResult = EndImpl<MessagesResult>(asyncResult);
+            if (messagesResult == null) return 0;
             var errorEntryList = (IList)asyncResult.AsyncState;
 
-            var entries =
-                from Message m in (IEnumerable)messagesResult.Messages
-                select MapErrorLogEntry(m);
+            var entries = messagesResult.Messages.Select(MapErrorOverviewEntry);
 
             foreach (var entry in entries)
             {
                 errorEntryList.Add(entry);
             }
 
-            return messagesResult.Total;
+            return messagesResult.Total ?? 0;
         }
 
         public override int GetErrors(int pageIndex, int pageSize, IList errorEntryList)
@@ -173,73 +152,83 @@ namespace Elmah.Io
         {
             if (asyncResult == null)
             {
-                throw new ArgumentNullException("asyncResult");
+                throw new ArgumentNullException(nameof(asyncResult));
             }
 
             var task = asyncResult as Task<T>;
             if (task == null)
             {
-                throw new ArgumentException(null, "asyncResult");
+                throw new ArgumentException(null, nameof(asyncResult));
             }
 
             return task.Result;
         }
 
-        private string ResolveApplicationName(IDictionary config)
+        private static void Continue<T>(AsyncCallback asyncCallback, Task<T> t, TaskCompletionSource<T> tcs)
         {
-            return config.Contains("applicationName") ? config["applicationName"].ToString() : string.Empty;
-        }
-
-        private Uri ResolveUrl(IDictionary config)
-        {
-            if (!config.Contains("Url"))
+            // Copy the task result into the returned task.
+            if (t.IsFaulted && t.Exception != null)
             {
-                return null;
+                tcs.TrySetException(t.Exception.InnerExceptions);
             }
-
-            Uri uri;
-            if (!Uri.TryCreate(config["Url"].ToString(), UriKind.Absolute, out uri))
+            else if (t.IsCanceled)
             {
-                throw new ApplicationException(
-                    "Invalid URL. Please specify a valid absolute url. In fact you don't even need to specify an url, which will make the error logger use the elmah.io backend.");
-            }
-
-            return new Uri(config["Url"].ToString());
-        }
-
-        private Guid ResolveLogId(IDictionary config)
-        {
-            if (config.Contains("LogId"))
-            {
-                Guid result;
-                if (!Guid.TryParse(config["LogId"].ToString(), out result))
-                {
-                    throw new ApplicationException(
-                        "Invalid LogId. Please specify a valid LogId in your web.config like this: <errorLog type=\"Elmah.Io.ErrorLog, Elmah.Io\" LogId=\"98895825-2516-43DE-B514-FFB39EA89A65\" />");
-                }
-
-                return result;
+                tcs.TrySetCanceled();
             }
             else
             {
-                var appSettingsKey = config["LogIdKey"].ToString();
-                var value = ConfigurationManager.AppSettings.Get(appSettingsKey);
-                if (value == null)
-                {
-                    throw new ApplicationException(
-                        "You are trying to reference a AppSetting which is not found (key = '" + appSettingsKey + "'");
-                }
-
-                Guid result;
-                if (!Guid.TryParse(value, out result))
-                {
-                    throw new ApplicationException(
-                        "Invalid LogId. Please specify a valid LogId in your web.config like this: <appSettings><add key=\""
-                        + appSettingsKey + "\" value=\"98895825-2516-43DE-B514-FFB39EA89A65\" />");
-                }
-
-                return result;
+                tcs.TrySetResult(t.Result);
             }
+
+            asyncCallback?.Invoke(tcs.Task);
+        }
+
+        private ErrorLogEntry MapErrorLogEntry(Message message)
+        {
+            var error = new Error
+            {
+                ApplicationName = message.Application,
+                Detail = message.Detail,
+                HostName = message.Hostname,
+                Message = message.Title,
+                Source = message.Source,
+                StatusCode = message.StatusCode ?? 0,
+                Time = message.DateTime.Value,
+                Type = message.Type,
+                User = message.User,
+            };
+
+            (message.Cookies ?? new List<Item>()).ToList().ForEach(c => error.Cookies.Add(c.Key, c.Value));
+            (message.Form ?? new List<Item>()).ToList().ForEach(c => error.Form.Add(c.Key, c.Value));
+            (message.QueryString ?? new List<Item>()).ToList().ForEach(c => error.QueryString.Add(c.Key, c.Value));
+            (message.ServerVariables ?? new List<Item>()).ToList().ForEach(c => error.ServerVariables.Add(c.Key, c.Value));
+
+            var errorLogEntry = new ErrorLogEntry(this, message.Id, error);
+            return errorLogEntry;
+        }
+
+        private ErrorLogEntry MapErrorOverviewEntry(MessageOverview message)
+        {
+            var error = new Error
+            {
+                ApplicationName = message.Application,
+                Detail = message.Detail,
+                HostName = message.Hostname,
+                Message = message.Title,
+                Source = message.Source,
+                StatusCode = message.StatusCode ?? 0,
+                Time = message.DateTime.Value,
+                Type = message.Type,
+                User = message.User,
+            };
+
+            var errorLogEntry = new ErrorLogEntry(this, message.Id, error);
+            return errorLogEntry;
+        }
+
+        private IList<Item> Itemize(NameValueCollection nameValues)
+        {
+            return nameValues.AllKeys.Select(key => new Item { Key = key, Value = nameValues[key] }).ToList();
         }
     }
 }
