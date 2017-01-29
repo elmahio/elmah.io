@@ -17,8 +17,8 @@
 	<tags>Error Exception Reporting Management Logging ELMAH Diagnostics Tracing</tags>
   </metadata>
   <files>
-    <file src="NuGet\content\web.config.transform" target="content\web.config.transform" />
-    <file src="NuGet\content\web.config.install.xdt" target="content\web.config.install.xdt" />
-    <file src="NuGet\tools\install.ps1" target="tools\install.ps1" />
+    <file src="Elmah.Io\NuGet\content\web.config.transform" target="content\web.config.transform" />
+    <file src="Elmah.Io\NuGet\content\web.config.install.xdt" target="content\web.config.install.xdt" />
+    <file src="Elmah.Io\NuGet\tools\install.ps1" target="tools\install.ps1" />
   </files>
 </package>
