@@ -36,8 +36,9 @@
       <HintPath>..\packages\Castle.Core.4.0.0\lib\net45\Castle.Core.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Elmah">
+    <Reference Include="Elmah, Version=1.2.14706.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\elmah.corelibrary.1.2.2\lib\Elmah.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="Elmah.Io.Client, Version=3.0.39.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Elmah.Io.Client.3.0.39-pre\lib\netstandard1.1\Elmah.Io.Client.dll</HintPath>
