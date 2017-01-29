@@ -1,11 +1,11 @@
 ﻿<?xml version="1.0"?>
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
   <metadata>
-    <version>3.0.0-pre</version>
+    <version>$version$</version>
     <authors>elmah.io</authors>
     <owners />
     <dependencies>
-      <dependency id="elmah.io.core" version="3.0.0-pre" />
+      <dependency id="elmah.io.core" version="$version$" />
     </dependencies>
     <id>elmah.io</id>
     <title>elmah.io</title>
