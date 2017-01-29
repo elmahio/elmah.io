@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0"?>
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
   <metadata>
-    <version>$version$</version>
+    <version>3.0.0-pre</version>
     <authors>elmah.io</authors>
     <owners />
     <dependencies>
