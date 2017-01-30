@@ -9,7 +9,7 @@ namespace Elmah.Io.Tests
         [SetUp]
         public void SetUp()
         {
-            ErrorLog.Client = null;
+            ErrorLog.Api = null;
         }
 
         [Test]

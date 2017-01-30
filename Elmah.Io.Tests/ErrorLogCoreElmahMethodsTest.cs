@@ -22,7 +22,7 @@ namespace Elmah.Io.Tests
         public void SetUp()
         {
             _fixture = new Fixture();
-            ErrorLog.Client = null;
+            ErrorLog.Api = null;
             var clientMock = new Mock<IElmahioAPI>();
             _messagesMock = new Mock<IMessages>();
             clientMock.Setup(x => x.Messages).Returns(_messagesMock.Object);

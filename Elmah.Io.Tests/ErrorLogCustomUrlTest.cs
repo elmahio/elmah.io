@@ -13,7 +13,7 @@ namespace Elmah.Io.Tests
         public void SetUp()
         {
             _fixture = new Fixture();
-            ErrorLog.Client = null;
+            ErrorLog.Api = null;
         }
 
         [Test]
@@ -30,7 +30,7 @@ namespace Elmah.Io.Tests
                 });
 
             // Act
-            var uri = ErrorLog.Client.BaseUri;
+            var uri = ErrorLog.Api.BaseUri;
 
             // Assert
             Assert.That(uri, Is.EqualTo(configUri));

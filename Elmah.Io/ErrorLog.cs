@@ -11,9 +11,11 @@ namespace Elmah.Io
 {
     public class ErrorLog : Elmah.ErrorLog, IErrorLog
     {
-        public static IElmahioAPI Client;
+        public static IElmahioAPI Api;
 
         private readonly Guid _logId;
+
+        public static IMessages Client => Api.Messages;
 
         /// <summary>
         /// ELMAH doesn't use this constructor and it is only published in order for you to create
@@ -23,7 +25,7 @@ namespace Elmah.Io
         /// </summary>
         public ErrorLog(IElmahioAPI logger)
         {
-            Client = logger;
+            Api = logger;
         }
 
         /// <summary>
@@ -45,7 +47,7 @@ namespace Elmah.Io
             var apiKey = config.ApiKey();
             ApplicationName = config.ApplicationName();
 
-            if (Client != null) return;
+            if (Api != null) return;
 
             var url = config.Url();
             var elmahioApi = ElmahioAPI.Create(apiKey);
@@ -54,7 +56,7 @@ namespace Elmah.Io
                 elmahioApi.BaseUri = url;
             }
 
-            Client = elmahioApi;
+            Api = elmahioApi;
         }
 
         public override string Log(Error error)
@@ -66,7 +68,6 @@ namespace Elmah.Io
         {
             var tcs = new TaskCompletionSource<Message>(asyncState);
             Client
-                .Messages
                 .CreateAndNotifyAsync(_logId, new CreateMessage
                 {
                     Application = error.ApplicationName,
@@ -98,7 +99,6 @@ namespace Elmah.Io
         {
             var tcs = new TaskCompletionSource<Message>(asyncState);
             Client
-                .Messages
                 .GetAsync(id, _logId.ToString())
                 .ContinueWith(t => Continue(asyncCallback, t, tcs));
             return tcs.Task;
@@ -121,7 +121,6 @@ namespace Elmah.Io
         {
             var tcs = new TaskCompletionSource<MessagesResult>(errorEntryList);
             Client
-                .Messages
                 .GetAllAsync(_logId.ToString(), pageIndex, pageSize)
                 .ContinueWith(t => Continue(asyncCallback, t, tcs));
             return tcs.Task;
