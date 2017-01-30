@@ -6,7 +6,7 @@
     <owners />
     <dependencies>
       <dependency id="elmah.corelibrary" version="1.2.2" />
-      <dependency id="elmah.io.client" version="3.0.39-pre" />
+      <dependency id="elmah.io.client" version="3.0.41-pre" />
     </dependencies>
     <id>elmah.io.core</id>
     <title>elmah.io core (no config)</title>
