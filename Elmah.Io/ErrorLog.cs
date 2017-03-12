@@ -80,10 +80,11 @@ namespace Elmah.Io
                     ServerVariables = Itemize(error.ServerVariables),
                     Title = error.Message,
                     Source = error.Source,
-                    StatusCode = error.StatusCode,
+                    StatusCode = StatusCode(error),
                     Type = error.Type,
                     User = error.User,
                     Data = error.Exception.ToDataList(),
+                    Severity = Severity(error),
                 })
                 .ContinueWith(t => Continue(asyncCallback, t, tcs));
             return tcs.Task;
@@ -228,6 +229,30 @@ namespace Elmah.Io
         private IList<Item> Itemize(NameValueCollection nameValues)
         {
             return nameValues.AllKeys.Select(key => new Item { Key = key, Value = nameValues[key] }).ToList();
+        }
+
+        private static string Severity(Error error)
+        {
+            var statusCode = StatusCode(error);
+
+            if (statusCode.HasValue && statusCode >= 400 && statusCode < 500) return Io.Client.Severity.Warning.ToString();
+            if (statusCode.HasValue && statusCode >= 500) return Io.Client.Severity.Error.ToString();
+            if (error.Exception != null) return Io.Client.Severity.Error.ToString();
+
+            return null; // Let elmah.io decide when receiving the message
+        }
+
+        private static int? StatusCode(Error error)
+        {
+            if (error.Exception != null)
+            {
+                // If an exception is thrown, but the response has a successful status code,
+                // it is because the correct status code is not yet assigned.
+                // Override it with 500.
+                return error.StatusCode < 400 ? 500 : error.StatusCode;
+            }
+
+            return error.StatusCode;
         }
     }
 }
