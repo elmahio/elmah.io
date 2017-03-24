@@ -5,7 +5,7 @@
     <authors>elmah.io</authors>
     <owners />
     <dependencies>
-      <dependency id="Elmah.Io.Core" version="$version$" />
+      <dependency id="elmah.io.core" version="$version$" />
       <dependency id="Elmah.MVC" version="2.1.2" />
     </dependencies>
     <id>Elmah.Io.Mvc</id>

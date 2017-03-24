@@ -8,7 +8,7 @@
       <dependency id="elmah.corelibrary" version="1.2.2" />
       <dependency id="elmah.io.client" version="3.0.41-pre" />
     </dependencies>
-    <id>Elmah.Io.Core</id>
+    <id>elmah.io.core</id>
     <title>Elmah.Io.Core</title>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>ELMAH error logger for sending errors to elmah.io. This package does not include any ELMAH configuration. Please install one of the specialized NuGet packages like Elmah.Io.Mvc, Elmah.Io.WebApi etc.</description>
