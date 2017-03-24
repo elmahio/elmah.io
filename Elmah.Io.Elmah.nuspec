@@ -17,6 +17,6 @@
 	<tags>Error Exception Reporting Management Logging ELMAH Diagnostics Tracing</tags>
   </metadata>
   <files>
-    <file src="src\Elmah.Io.Elmah\bin\$Configuration$\Elmah.Io.dll" target="lib\net40\Elmah.Io.dll" />
+    <file src="src\Elmah.Io.Elmah\bin\$Configuration$\Elmah.Io.Elmah.dll" target="lib\net40\Elmah.Io.Elmah.dll" />
   </files>
 </package>
