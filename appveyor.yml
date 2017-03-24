@@ -14,7 +14,7 @@ after_build:
 - ps: >-
     nuget pack Elmah.Io.nuspec -Version $env:APPVEYOR_BUILD_VERSION -Properties Configuration=Release
 
-    nuget pack Elmah.Io.Elmah.nuspec -Version $env:APPVEYOR_BUILD_VERSION -Properties Configuration=Release
+    nuget pack Elmah.Io.Core.nuspec -Version $env:APPVEYOR_BUILD_VERSION -Properties Configuration=Release
 
     nuget pack Elmah.Io.Mvc.nuspec -Version $env:APPVEYOR_BUILD_VERSION -Properties Configuration=Release
 
