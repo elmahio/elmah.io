@@ -9,20 +9,20 @@ namespace Elmah.Io.Tests
         [SetUp]
         public void SetUp()
         {
-            Elmah.ErrorLog.Api = null;
+            ErrorLog.Api = null;
         }
 
         [Test]
         public void AssertThrowsArgumentNullExceptionOnMissingConfig()
         {
-            var exception = Assert.Throws<ArgumentNullException>(() => new Elmah.ErrorLog((IDictionary)null));
+            var exception = Assert.Throws<ArgumentNullException>(() => new ErrorLog((IDictionary)null));
             Assert.That(exception.ParamName, Is.EqualTo("config"));
         }
 
         [Test]
         public void CanCreateErrorLogWithValidLogIdAndApiKey()
         {
-            var errorLog = new Elmah.ErrorLog(new Hashtable
+            var errorLog = new ErrorLog(new Hashtable
             {
                 {"logId", Guid.NewGuid().ToString()},
                 {"apiKey", "ApiKey"}
@@ -33,7 +33,7 @@ namespace Elmah.Io.Tests
         [Test]
         public void CanCreateErrorLogWithValidLogIdKeyAndApiKeyKey()
         {
-            var errorLog = new Elmah.ErrorLog(new Hashtable
+            var errorLog = new ErrorLog(new Hashtable
             {
                 {"LogIdKey", "MyValidLogId"},
                 {"apiKeyKey", "MyValidApiKey"}
@@ -44,7 +44,7 @@ namespace Elmah.Io.Tests
         [Test]
         public void CanCreateErrorLogWithApplicationName()
         {
-            var errorLog = new Elmah.ErrorLog(new Hashtable
+            var errorLog = new ErrorLog(new Hashtable
             {
                 {"logId", Guid.NewGuid().ToString()},
                 {"apiKey", "ApiKey"},

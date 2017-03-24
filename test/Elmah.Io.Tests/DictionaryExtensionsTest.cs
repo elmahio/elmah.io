@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections;
-using Elmah.Io.Elmah;
 using NUnit.Framework;
 
 namespace Elmah.Io.Tests

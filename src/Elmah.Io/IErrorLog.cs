@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections;
 
-namespace Elmah.Io.Elmah
+namespace Elmah.Io
 {
     public interface IErrorLog
     {

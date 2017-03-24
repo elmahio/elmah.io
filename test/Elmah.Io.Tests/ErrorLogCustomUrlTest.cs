@@ -13,7 +13,7 @@ namespace Elmah.Io.Tests
         public void SetUp()
         {
             _fixture = new Fixture();
-            Elmah.ErrorLog.Api = null;
+            ErrorLog.Api = null;
         }
 
         [Test]
@@ -22,7 +22,7 @@ namespace Elmah.Io.Tests
             // Arrange
             var configUri = _fixture.Create<Uri>();
             var errorLog =
-                new Elmah.ErrorLog(new Hashtable
+                new ErrorLog(new Hashtable
                 {
                     {"logId", _fixture.Create<Guid>().ToString()},
                     {"apiKey", "MyKey"},
@@ -30,7 +30,7 @@ namespace Elmah.Io.Tests
                 });
 
             // Act
-            var uri = Elmah.ErrorLog.Api.BaseUri;
+            var uri = ErrorLog.Api.BaseUri;
 
             // Assert
             Assert.That(uri, Is.EqualTo(configUri));

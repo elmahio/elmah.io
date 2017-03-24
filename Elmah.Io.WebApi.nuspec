@@ -5,7 +5,7 @@
     <authors>elmah.io</authors>
     <owners />
     <dependencies>
-      <dependency id="Elmah.Io.Elmah" version="$version$" />
+      <dependency id="Elmah.Io.Core" version="$version$" />
 	  <dependency id="Elmah.Contrib.WebApi" version="1.0.10.25" />
     </dependencies>
     <id>Elmah.Io.WebApi</id>

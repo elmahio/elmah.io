@@ -3,7 +3,7 @@ using System.Collections;
 using System.Configuration;
 using System.Linq;
 
-namespace Elmah.Io.Elmah
+namespace Elmah.Io
 {
     internal static class DictionaryExtensions
     {

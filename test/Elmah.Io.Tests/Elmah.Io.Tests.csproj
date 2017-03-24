@@ -81,9 +81,9 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\src\Elmah.Io.Elmah\Elmah.Io.Elmah.csproj">
+    <ProjectReference Include="..\..\src\Elmah.Io\Elmah.Io.csproj">
       <Project>{f74f4e5f-bcef-4c85-b0af-6a0aeb207d10}</Project>
-      <Name>Elmah.Io.Elmah</Name>
+      <Name>Elmah.Io</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

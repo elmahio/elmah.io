@@ -7,8 +7,8 @@
     <ProjectGuid>{F74F4E5F-BCEF-4C85-B0AF-6A0AEB207D10}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Elmah.Io.Elmah</RootNamespace>
-    <AssemblyName>Elmah.Io.Elmah</AssemblyName>
+    <RootNamespace>Elmah.Io</RootNamespace>
+    <AssemblyName>Elmah.Io</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>

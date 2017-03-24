@@ -15,18 +15,18 @@ namespace Elmah.Io.Tests
     public class ErrorLogCoreElmahMethodsTest
     {
         private Fixture _fixture;
-        private Elmah.ErrorLog _errorLog;
+        private ErrorLog _errorLog;
         Mock<IMessages> _messagesMock;
 
         [SetUp]
         public void SetUp()
         {
             _fixture = new Fixture();
-            Elmah.ErrorLog.Api = null;
+            ErrorLog.Api = null;
             var clientMock = new Mock<IElmahioAPI>();
             _messagesMock = new Mock<IMessages>();
             clientMock.Setup(x => x.Messages).Returns(_messagesMock.Object);
-            _errorLog = new Elmah.ErrorLog(clientMock.Object);
+            _errorLog = new ErrorLog(clientMock.Object);
         }
 
         [Test]

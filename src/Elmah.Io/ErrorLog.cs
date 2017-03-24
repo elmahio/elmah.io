@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using Elmah.Io.Client;
 using Elmah.Io.Client.Models;
 
-namespace Elmah.Io.Elmah
+namespace Elmah.Io
 {
     public class ErrorLog : global::Elmah.ErrorLog, IErrorLog
     {
