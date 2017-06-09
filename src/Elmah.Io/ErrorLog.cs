@@ -84,7 +84,7 @@ namespace Elmah.Io
                     Type = error.Type,
                     User = error.User,
                     Data = error.Exception.ToDataList(),
-                    Severity = Severity(error),
+                    Severity = Severity.Error.ToString(),
                 })
                 .ContinueWith(t => Continue(asyncCallback, t, tcs));
             return tcs.Task;
@@ -229,17 +229,6 @@ namespace Elmah.Io
         private IList<Item> Itemize(NameValueCollection nameValues)
         {
             return nameValues.AllKeys.Select(key => new Item { Key = key, Value = nameValues[key] }).ToList();
-        }
-
-        private static string Severity(Error error)
-        {
-            var statusCode = StatusCode(error);
-
-            if (statusCode.HasValue && statusCode >= 400 && statusCode < 500) return Io.Client.Severity.Warning.ToString();
-            if (statusCode.HasValue && statusCode >= 500) return Io.Client.Severity.Error.ToString();
-            if (error.Exception != null) return Io.Client.Severity.Error.ToString();
-
-            return null; // Let elmah.io decide when receiving the message
         }
 
         private static int? StatusCode(Error error)
