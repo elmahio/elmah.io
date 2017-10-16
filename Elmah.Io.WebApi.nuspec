@@ -5,7 +5,8 @@
     <authors>elmah.io</authors>
     <owners />
     <dependencies>
-      <dependency id="elmah.io.core" version="$version$" />
+      <dependency id="elmah.corelibrary" version="1.2.2" />
+      <dependency id="Elmah.Io.Client" version="[3.0.46,4)" />
       <dependency id="Elmah.Contrib.WebApi" version="1.0.10.25" />
     </dependencies>
     <id>Elmah.Io.WebApi</id>
@@ -20,5 +21,6 @@
     <file src="nuget\content\web.config.transform" target="content\web.config.transform" />
     <file src="nuget\content\web.config.install.xdt" target="content\web.config.install.xdt" />
     <file src="nuget\tools\install.ps1" target="tools\install.ps1" />
+    <file src="src\Elmah.Io\bin\$Configuration$\Elmah.Io.dll" target="lib\net40\Elmah.Io.dll" />
   </files>
 </package>

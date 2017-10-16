@@ -1,12 +1,12 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26228.4
+VisualStudioVersion = 15.0.27004.2002
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{6A54AB67-75DF-4959-A02A-A7CEFE145B3A}"
 	ProjectSection(SolutionItems) = preProject
 		appveyor.yml = appveyor.yml
-		Elmah.Io.Core.nuspec = Elmah.Io.Core.nuspec
+		Elmah.Io.AspNet.nuspec = Elmah.Io.AspNet.nuspec
 		Elmah.Io.Mvc.nuspec = Elmah.Io.Mvc.nuspec
 		Elmah.Io.nuspec = Elmah.Io.nuspec
 		Elmah.Io.WebApi.nuspec = Elmah.Io.WebApi.nuspec
@@ -58,5 +58,8 @@ Global
 		{16569A48-41A8-465A-87C6-56038D8449B8} = {EA46250B-0E1A-4A6C-BCFD-259390757AFD}
 		{40F2BE34-94E7-48BC-A778-3596F5A69449} = {CCAC9F43-2711-4852-A658-20F476F0174C}
 		{25CA7F62-DF11-4B97-B470-45678E9C7A0C} = {CCAC9F43-2711-4852-A658-20F476F0174C}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {A303BF4E-9D68-41D7-A655-A739DD58FD78}
 	EndGlobalSection
 EndGlobal

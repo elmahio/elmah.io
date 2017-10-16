@@ -6,17 +6,20 @@
     <owners />
     <dependencies>
       <dependency id="elmah.corelibrary" version="1.2.2" />
-      <dependency id="elmah.io.client" version="3.0.41-pre" />
+      <dependency id="Elmah.Io.Client" version="[3.0.46,4)" />
     </dependencies>
-    <id>elmah.io.core</id>
-    <title>Elmah.Io.Core</title>
+    <id>Elmah.Io.AspNet</id>
+    <title>Elmah.Io.AspNet</title>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
-    <description>ELMAH error logger for sending errors to elmah.io. This package does not include any ELMAH configuration. Please install one of the specialized NuGet packages like Elmah.Io.Mvc, Elmah.Io.WebApi etc.</description>
+    <description>ELMAH error logger for sending errors to elmah.io from web frameworks built on ASP.NET (like MVC and Web API). This package does not include any ELMAH configuration. Please install one of the specialized NuGet packages like Elmah.Io.Mvc, Elmah.Io.WebApi etc.</description>
     <projectUrl>https://github.com/elmahio/elmah.io</projectUrl>
     <iconUrl>https://secure.gravatar.com/avatar/5c4cb3646528821117abde6d2d5ee22d?s=32</iconUrl>
 	<tags>Error Exception Reporting Management Logging ELMAH Diagnostics Tracing</tags>
   </metadata>
   <files>
+    <file src="nuget\content\web.config.transform" target="content\web.config.transform" />
+    <file src="nuget\content\web.config.install.xdt" target="content\web.config.install.xdt" />
+    <file src="nuget\tools\install.ps1" target="tools\install.ps1" />
     <file src="src\Elmah.Io\bin\$Configuration$\Elmah.Io.dll" target="lib\net40\Elmah.Io.dll" />
   </files>
 </package>

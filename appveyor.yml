@@ -1,4 +1,4 @@
-version: 3.1.{build}-pre
+version: 3.2.{build}-pre
 configuration: Release
 assembly_info:
   patch: true
@@ -14,7 +14,7 @@ after_build:
 - ps: >-
     nuget pack Elmah.Io.nuspec -Version $env:APPVEYOR_BUILD_VERSION -Properties Configuration=Release
 
-    nuget pack Elmah.Io.Core.nuspec -Version $env:APPVEYOR_BUILD_VERSION -Properties Configuration=Release
+    nuget pack Elmah.Io.AspNet.nuspec -Version $env:APPVEYOR_BUILD_VERSION -Properties Configuration=Release
 
     nuget pack Elmah.Io.Mvc.nuspec -Version $env:APPVEYOR_BUILD_VERSION -Properties Configuration=Release
 
