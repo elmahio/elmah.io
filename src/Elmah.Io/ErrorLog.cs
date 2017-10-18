@@ -17,15 +17,22 @@ namespace Elmah.Io
 
         public static IMessages Client => Api.Messages;
 
+        [Obsolete("Use overload which takes both IElmahioAPI and a Guid")]
+        public ErrorLog(IElmahioAPI logger)
+        {
+            Api = logger;
+        }
+
         /// <summary>
         /// ELMAH doesn't use this constructor and it is only published in order for you to create
         /// a new error logger using a custom implementation of ILogger or an instance of Logger that
         /// you've already created. If you implement your own ILogger, please  identify yourself
         /// using an appropriate user agent.
         /// </summary>
-        public ErrorLog(IElmahioAPI logger)
+        public ErrorLog(IElmahioAPI logger, Guid logId)
         {
             Api = logger;
+            _logId = logId;
         }
 
         /// <summary>

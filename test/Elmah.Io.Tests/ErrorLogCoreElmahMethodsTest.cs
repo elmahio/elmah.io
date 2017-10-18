@@ -17,16 +17,18 @@ namespace Elmah.Io.Tests
         private Fixture _fixture;
         private ErrorLog _errorLog;
         Mock<IMessages> _messagesMock;
+        private Guid _logId;
 
         [SetUp]
         public void SetUp()
         {
             _fixture = new Fixture();
+            _logId = _fixture.Create<Guid>();
             ErrorLog.Api = null;
             var clientMock = new Mock<IElmahioAPI>();
             _messagesMock = new Mock<IMessages>();
             clientMock.Setup(x => x.Messages).Returns(_messagesMock.Object);
-            _errorLog = new ErrorLog(clientMock.Object);
+            _errorLog = new ErrorLog(clientMock.Object, _logId);
         }
 
         [Test]
@@ -36,10 +38,15 @@ namespace Elmah.Io.Tests
             var id = _fixture.Create<string>();
             var logMessage = _fixture.Create<string>();
             CreateMessage actualMessage = null;
+            Guid? actualLogId = null;
 
             _messagesMock
                 .Setup(x => x.CreateAndNotifyAsync(It.IsAny<Guid>(), It.IsAny<CreateMessage>()))
-                .Callback<Guid, CreateMessage>((logId, msg) => { actualMessage = msg; })
+                .Callback<Guid, CreateMessage>((logId, msg) =>
+                {
+                    actualLogId = logId;
+                    actualMessage = msg;
+                })
                 .Returns(Task.FromResult(new Message {Id = id}));
 
             // Act
@@ -47,6 +54,7 @@ namespace Elmah.Io.Tests
 
             // Assert
             Assert.That(result, Is.EqualTo(id));
+            Assert.That(actualLogId, Is.EqualTo(_logId));
             Assert.That(actualMessage, Is.Not.Null);
             Assert.That(actualMessage.Title, Is.EqualTo(logMessage));
         }
