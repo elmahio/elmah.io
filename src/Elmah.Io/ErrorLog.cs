@@ -84,7 +84,6 @@ namespace Elmah.Io
                     Type = error.Type,
                     User = error.User,
                     Data = error.Exception.ToDataList(),
-                    Severity = Severity.Error.ToString(),
                 })
                 .ContinueWith(t => Continue(asyncCallback, t, tcs));
             return tcs.Task;
