@@ -7,15 +7,15 @@
     <dependencies>
       <dependency id="elmah.corelibrary" version="1.2.2" />
       <dependency id="Elmah.Io.Client" version="[3.0.46,4)" />
+      <dependency id="Elmah.Contrib.WebApi" version="1.0.10.25" />
     </dependencies>
-    <id>elmah.io</id>
-    <title>elmah.io</title>
+    <id>Elmah.Io.WebApi</id>
+    <title>Elmah.Io.WebApi</title>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
-    <summary>ELMAH error logger for sending errors to elmah.io. This package include initial configuration for getting up and running with elmah.io.</summary>
-    <description>ELMAH error logger for sending errors to elmah.io. This package include initial configuration for getting up and running with elmah.io from ASP.NET, MVC, Web API etc. Consider using one of the specialized packages instead (Elmah.Io.Mvc, Elmah.Io.WebApi etc.).</description>
+    <description>ELMAH error logger for sending errors to elmah.io from ASP.NET Web API. This package include initial configuration for getting up and running with elmah.io.</description>
     <projectUrl>https://github.com/elmahio/elmah.io</projectUrl>
     <iconUrl>https://secure.gravatar.com/avatar/5c4cb3646528821117abde6d2d5ee22d?s=32</iconUrl>
-    <tags>Error Exception Reporting Management Logging ELMAH Diagnostics Tracing</tags>
+	<tags>Error Exception Reporting Management Logging ELMAH Diagnostics Tracing</tags>
   </metadata>
   <files>
     <file src="nuget\content\web.config.transform" target="content\web.config.transform" />

@@ -1,0 +1,5 @@
+<configuration xmlns:xdt="http://schemas.microsoft.com/XML-Document-Transform">
+  <elmah>
+    <errorLog type="Elmah.Io.ErrorLog, Elmah.Io" apiKey="ELMAH_IO_API_KEY" logId="ELMAH_IO_LOG_ID" xdt:Transform="InsertIfMissing" />
+  </elmah>
+</configuration>
