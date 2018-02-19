@@ -100,7 +100,8 @@ namespace Elmah.Io.Tests
                 .Setup(
                     x =>
                         x.GetAllWithHttpMessagesAsync(It.IsAny<string>(), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<string>(),
-                            It.IsAny<DateTime?>(), It.IsAny<DateTime?>(), It.IsAny<Dictionary<string,List<string>>>(), It.IsAny<CancellationToken>()))
+                            It.IsAny<DateTime?>(), It.IsAny<DateTime?>(), It.IsAny<bool?>(), It.IsAny<Dictionary<string,List<string>>>(),
+                            It.IsAny<CancellationToken>()))
                 .Returns(taskCompletionSource.Task);
 
             // Act
