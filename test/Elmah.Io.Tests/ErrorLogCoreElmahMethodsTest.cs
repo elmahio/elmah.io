@@ -8,7 +8,7 @@ using Elmah.Io.Client.Models;
 using Microsoft.Rest;
 using Moq;
 using NUnit.Framework;
-using Ploeh.AutoFixture;
+using AutoFixture;
 
 namespace Elmah.Io.Tests
 {

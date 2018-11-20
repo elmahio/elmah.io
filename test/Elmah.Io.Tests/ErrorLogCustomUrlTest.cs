@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections;
 using NUnit.Framework;
-using Ploeh.AutoFixture;
+using AutoFixture;
 
 namespace Elmah.Io.Tests
 {
