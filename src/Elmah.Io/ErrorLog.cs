@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
+using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using Elmah.Io.Client;
 using Elmah.Io.Client.Models;
@@ -11,17 +12,13 @@ namespace Elmah.Io
 {
     public class ErrorLog : global::Elmah.ErrorLog, IErrorLog
     {
+        internal static string _assemblyVersion = typeof(ErrorLog).Assembly.GetName().Version.ToString();
+
         public static IElmahioAPI Api;
 
         private readonly Guid _logId;
 
         public static IMessages Client => Api.Messages;
-
-        [Obsolete("Use overload which takes both IElmahioAPI and a Guid")]
-        public ErrorLog(IElmahioAPI logger)
-        {
-            Api = logger;
-        }
 
         /// <summary>
         /// ELMAH doesn't use this constructor and it is only published in order for you to create
@@ -57,7 +54,12 @@ namespace Elmah.Io
             if (Api != null) return;
 
             var url = config.Url();
-            var elmahioApi = ElmahioAPI.Create(apiKey);
+
+            ElmahioAPI elmahioApi = new ElmahioAPI(new ApiKeyCredentials(apiKey), HttpClientHandlerFactory.GetHttpClientHandler(new ElmahIoOptions()));
+            elmahioApi.HttpClient.Timeout = new TimeSpan(0, 0, 5);
+            elmahioApi.HttpClient.DefaultRequestHeaders.UserAgent.Clear();
+            elmahioApi.HttpClient.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue(new ProductHeaderValue("Elmah.Io", _assemblyVersion)));
+
             if (url != null)
             {
                 elmahioApi.BaseUri = url;

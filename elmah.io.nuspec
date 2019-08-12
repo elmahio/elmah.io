@@ -6,14 +6,15 @@
     <owners />
     <dependencies>
       <dependency id="elmah.corelibrary" version="1.2.2" />
-      <dependency id="Elmah.Io.Client" version="[3.3.61,4)" />
+      <dependency id="Elmah.Io.Client" version="[3.5.67,4)" />
     </dependencies>
     <id>elmah.io</id>
     <title>elmah.io</title>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <summary>ELMAH error logger for sending errors to elmah.io. This package include initial configuration for getting up and running with elmah.io.</summary>
     <description>ELMAH error logger for sending errors to elmah.io. This package include initial configuration for getting up and running with elmah.io from ASP.NET, MVC, Web API etc. Consider using one of the specialized packages instead (Elmah.Io.Mvc, Elmah.Io.WebApi etc.).</description>
-    <projectUrl>https://github.com/elmahio/elmah.io</projectUrl>
+    <projectUrl>https://elmah.io/</projectUrl>
+    <repository type="git" url="https://github.com/elmahio/elmah.io" />
     <iconUrl>https://secure.gravatar.com/avatar/5c4cb3646528821117abde6d2d5ee22d?s=64</iconUrl>
     <tags>Error Exception Reporting Management Logging ELMAH Diagnostics Tracing</tags>
   </metadata>
