@@ -10,6 +10,7 @@
     </dependencies>
     <id>Elmah.Io.AspNet</id>
     <title>Elmah.Io.AspNet</title>
+    <license type="expression">Apache-2.0</license>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>ELMAH error logger for sending errors to elmah.io from web frameworks built on ASP.NET (like MVC and Web API). This package does not include any ELMAH configuration. Please install one of the specialized NuGet packages like Elmah.Io.Mvc, Elmah.Io.WebApi etc.</description>
     <projectUrl>https://elmah.io/</projectUrl>

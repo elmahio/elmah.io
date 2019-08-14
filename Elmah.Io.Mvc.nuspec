@@ -11,6 +11,7 @@
     </dependencies>
     <id>Elmah.Io.Mvc</id>
     <title>Elmah.Io.Mvc</title>
+    <license type="expression">Apache-2.0</license>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>ELMAH error logger for sending errors to elmah.io from ASP.NET Core. This package include initial configuration for getting up and running with elmah.io.</description>
     <projectUrl>https://elmah.io/</projectUrl>

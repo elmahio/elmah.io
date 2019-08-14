@@ -10,6 +10,7 @@
     </dependencies>
     <id>elmah.io</id>
     <title>elmah.io</title>
+    <license type="expression">Apache-2.0</license>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <summary>ELMAH error logger for sending errors to elmah.io. This package include initial configuration for getting up and running with elmah.io.</summary>
     <description>ELMAH error logger for sending errors to elmah.io. This package include initial configuration for getting up and running with elmah.io from ASP.NET, MVC, Web API etc. Consider using one of the specialized packages instead (Elmah.Io.Mvc, Elmah.Io.WebApi etc.).</description>
