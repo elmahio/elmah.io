@@ -6,7 +6,7 @@
     <owners />
     <dependencies>
       <dependency id="elmah.corelibrary" version="1.2.2" />
-      <dependency id="Elmah.Io.Client" version="[3.5.67,4)" />
+      <dependency id="Elmah.Io.Client" version="[3.6.72-pre,4)" />
     </dependencies>
     <id>Elmah.Io.AspNet</id>
     <title>Elmah.Io.AspNet</title>
