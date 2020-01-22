@@ -57,7 +57,6 @@ namespace Elmah.Io
 
             var elmahioApi = (ElmahioAPI)ElmahioAPI.Create(apiKey);
             elmahioApi.HttpClient.Timeout = new TimeSpan(0, 0, 5);
-            elmahioApi.HttpClient.DefaultRequestHeaders.UserAgent.Clear();
             elmahioApi.HttpClient.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue(new ProductHeaderValue("Elmah.Io", _assemblyVersion)));
 
             if (url != null)
