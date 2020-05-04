@@ -2,6 +2,7 @@ version: 3.6.{build}-pre
 branches:
   only:
   - master
+image: Visual Studio 2019
 configuration: Release
 assembly_info:
   patch: true
