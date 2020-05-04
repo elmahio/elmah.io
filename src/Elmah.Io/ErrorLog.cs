@@ -4,7 +4,9 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
 using System.Net.Http.Headers;
+using System.Runtime.InteropServices;
 using System.Threading.Tasks;
+using System.Web;
 using Elmah.Io.Client;
 using Elmah.Io.Client.Models;
 
@@ -91,7 +93,7 @@ namespace Elmah.Io
                     StatusCode = StatusCode(error),
                     Type = error.Type,
                     User = error.User,
-                    Data = error.Exception.ToDataList(),
+                    Data = Data(error.Exception),
                 })
                 .ContinueWith(t => Continue(asyncCallback, t, tcs));
             return tcs.Task;
@@ -249,6 +251,36 @@ namespace Elmah.Io
             }
 
             return error.StatusCode;
+        }
+
+        private IList<Item> Data(Exception exception)
+        {
+            if (exception == null) return null;
+            var items = new List<Item>();
+            var dataItems = exception.ToDataList();
+            if (dataItems.Count > 0)
+            {
+                items.AddRange(dataItems);
+            }
+
+            if (exception is ExternalException ee)
+            {
+                items.Add(new Item { Key = ee.ItemName(nameof(ee.ErrorCode)), Value = ee.ErrorCode.ToString() });
+            }
+
+            if (exception is HttpException he)
+            {
+                items.Add(new Item { Key = he.ItemName(nameof(he.WebEventCode)), Value = he.WebEventCode.ToString() });
+            }
+
+            if (exception is HttpParseException hpe)
+            {
+                items.Add(new Item { Key = hpe.ItemName(nameof(hpe.FileName)), Value = hpe.FileName ?? string.Empty });
+                items.Add(new Item { Key = hpe.ItemName(nameof(hpe.Line)), Value = hpe.Line.ToString() });
+                items.Add(new Item { Key = hpe.ItemName(nameof(hpe.VirtualPath)), Value = hpe.VirtualPath ?? string.Empty });
+            }
+
+            return items;
         }
     }
 }
