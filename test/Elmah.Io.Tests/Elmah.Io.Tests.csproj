@@ -49,8 +49,8 @@
     <Reference Include="Elmah, Version=1.2.14706.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\..\packages\elmah.corelibrary.1.2.2\lib\Elmah.dll</HintPath>
     </Reference>
-    <Reference Include="Elmah.Io.Client, Version=3.8.83.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Elmah.Io.Client.3.8.83-pre\lib\net461\Elmah.Io.Client.dll</HintPath>
+    <Reference Include="Elmah.Io.Client, Version=3.8.86.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Elmah.Io.Client.3.8.86\lib\net461\Elmah.Io.Client.dll</HintPath>
     </Reference>
     <Reference Include="Fare, Version=2.1.0.0, Culture=neutral, PublicKeyToken=ea68d375bf33a7c8, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Fare.2.1.1\lib\net35\Fare.dll</HintPath>
