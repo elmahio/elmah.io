@@ -21,4 +21,4 @@ jobs:
     - name: Build
       run: msbuild elmah.io.sln /t:Build /p:Configuration=Release
     - name: Test
-      run: dotnet vstest test/Elmah.Io.Tests/bin/Release/net472/Elmah.Io.Tests.dll
+      run: dotnet vstest test\Elmah.Io.Tests\bin\Release\net472\Elmah.Io.Tests.dll
