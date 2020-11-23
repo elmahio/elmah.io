@@ -30,3 +30,15 @@ jobs:
       run: nuget pack Elmah.Io.Mvc.nuspec -Version 3.7.${{ github.run_number }}-pre -Properties Configuration=Release
     - name: Pack Elmah.Io.WebApi
       run: nuget pack Elmah.Io.WebApi.nuspec -Version 3.7.${{ github.run_number }}-pre -Properties Configuration=Release
+    - name: Push Elmah.Io
+      run: dotnet nuget push Elmah.Io.3.7.${{ github.run_number }}-pre.nupkg --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json
+      if: ${{ github.event_name == 'push' }}
+    - name: Push Elmah.Io.AspNet
+      run: dotnet nuget push Elmah.Io.AspNet.3.7.${{ github.run_number }}-pre.nupkg --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json
+      if: ${{ github.event_name == 'push' }}
+    - name: Push Elmah.Io.Mvc
+      run: dotnet nuget push Elmah.Io.Mvc.3.7.${{ github.run_number }}-pre.nupkg --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json
+      if: ${{ github.event_name == 'push' }}
+    - name: Push Elmah.Io.WebApi
+      run: dotnet nuget push Elmah.Io.WebApi.3.7.${{ github.run_number }}-pre.nupkg --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json
+      if: ${{ github.event_name == 'push' }}
