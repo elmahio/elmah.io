@@ -20,3 +20,5 @@ jobs:
       run: nuget restore elmah.io.sln
     - name: Build
       run: msbuild elmah.io.sln /t:Build /p:Configuration=Release
+    - name: Test
+      run: dotnet test
