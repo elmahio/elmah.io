@@ -15,12 +15,14 @@
     <license type="expression">Apache-2.0</license>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>ELMAH error logger for sending errors to elmah.io from web frameworks built on ASP.NET (like MVC and Web API). This package does not include any ELMAH configuration. Please install one of the specialized NuGet packages like Elmah.Io.Mvc, Elmah.Io.WebApi etc.</description>
+    <icon>icon.png</icon>
     <projectUrl>https://elmah.io/</projectUrl>
     <repository type="git" url="https://github.com/elmahio/elmah.io" />
     <iconUrl>https://secure.gravatar.com/avatar/5c4cb3646528821117abde6d2d5ee22d?s=64</iconUrl>
     <tags>Error Exception Reporting Management Logging ELMAH Diagnostics Tracing</tags>
   </metadata>
   <files>
+    <file src="nuget\images\icon.png" target="icon.png" />
     <file src="nuget\content\web.config.transform" target="content\web.config.transform" />
     <file src="nuget\content\web.config.install.xdt" target="content\web.config.install.xdt" />
     <file src="nuget\tools\install.ps1" target="tools\install.ps1" />
