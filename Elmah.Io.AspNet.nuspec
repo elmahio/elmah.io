@@ -27,5 +27,6 @@
     <file src="nuget\content\web.config.install.xdt" target="content\web.config.install.xdt" />
     <file src="nuget\tools\install.ps1" target="tools\install.ps1" />
     <file src="src\Elmah.Io\bin\$Configuration$\net45\Elmah.Io.dll" target="lib\net45\Elmah.Io.dll" />
+    <file src="src\Elmah.Io\bin\$Configuration$\net45\Elmah.Io.xml" target="lib\net45\Elmah.Io.xml" />
   </files>
 </package>
