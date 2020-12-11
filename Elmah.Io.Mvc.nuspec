@@ -18,7 +18,7 @@
     <description>ELMAH error logger for sending errors to elmah.io from ASP.NET Core. This package include initial configuration for getting up and running with elmah.io.</description>
     <icon>icon.png</icon>
     <projectUrl>https://elmah.io/</projectUrl>
-    <repository type="git" url="https://github.com/elmahio/elmah.io" />
+    <repository type="git" url="https://github.com/elmahio/elmah.io" commit="$commit$" />
     <iconUrl>https://secure.gravatar.com/avatar/5c4cb3646528821117abde6d2d5ee22d?s=64</iconUrl>
     <tags>Error Exception Reporting Management Logging ELMAH Diagnostics Tracing</tags>
   </metadata>

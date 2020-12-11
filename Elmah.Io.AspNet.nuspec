@@ -17,7 +17,7 @@
     <description>ELMAH error logger for sending errors to elmah.io from web frameworks built on ASP.NET (like MVC and Web API). This package does not include any ELMAH configuration. Please install one of the specialized NuGet packages like Elmah.Io.Mvc, Elmah.Io.WebApi etc.</description>
     <icon>icon.png</icon>
     <projectUrl>https://elmah.io/</projectUrl>
-    <repository type="git" url="https://github.com/elmahio/elmah.io" />
+    <repository type="git" url="https://github.com/elmahio/elmah.io" commit="$commit$" />
     <iconUrl>https://secure.gravatar.com/avatar/5c4cb3646528821117abde6d2d5ee22d?s=64</iconUrl>
     <tags>Error Exception Reporting Management Logging ELMAH Diagnostics Tracing</tags>
   </metadata>
