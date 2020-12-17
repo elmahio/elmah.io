@@ -29,6 +29,24 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Elmah.Io", "src\Elmah.Io\El
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Elmah.Io.AspNet", "samples\Elmah.Io.AspNet\Elmah.Io.AspNet.csproj", "{B568C36C-E733-45B0-930B-E1D6CC677EE0}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "nuget", "nuget", "{A58EC0D2-C53E-48D5-9DAA-ABC62861207E}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "content", "content", "{B94F7263-FEC0-47C2-85A6-ACCA98CBB512}"
+	ProjectSection(SolutionItems) = preProject
+		nuget\content\web.config.install.xdt = nuget\content\web.config.install.xdt
+		nuget\content\web.config.transform = nuget\content\web.config.transform
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "images", "images", "{A4EA5EDA-D970-4CD3-B4C3-7D7A879F4C88}"
+	ProjectSection(SolutionItems) = preProject
+		nuget\images\icon.png = nuget\images\icon.png
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tools", "tools", "{00CAA87E-18A7-4E2E-87D9-9DA03D5D963D}"
+	ProjectSection(SolutionItems) = preProject
+		nuget\tools\install.ps1 = nuget\tools\install.ps1
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -65,6 +83,10 @@ Global
 		{564C3FA7-94D6-4754-BEDD-31F9617024DF} = {EA46250B-0E1A-4A6C-BCFD-259390757AFD}
 		{D7F5E914-AE53-4F26-BC15-C5FAA54C9FC5} = {596C65B2-9046-4B4C-8846-507EE58DABA5}
 		{B568C36C-E733-45B0-930B-E1D6CC677EE0} = {CCAC9F43-2711-4852-A658-20F476F0174C}
+		{A58EC0D2-C53E-48D5-9DAA-ABC62861207E} = {6A54AB67-75DF-4959-A02A-A7CEFE145B3A}
+		{B94F7263-FEC0-47C2-85A6-ACCA98CBB512} = {A58EC0D2-C53E-48D5-9DAA-ABC62861207E}
+		{A4EA5EDA-D970-4CD3-B4C3-7D7A879F4C88} = {A58EC0D2-C53E-48D5-9DAA-ABC62861207E}
+		{00CAA87E-18A7-4E2E-87D9-9DA03D5D963D} = {A58EC0D2-C53E-48D5-9DAA-ABC62861207E}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {A303BF4E-9D68-41D7-A655-A739DD58FD78}
