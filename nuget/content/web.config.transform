@@ -25,31 +25,4 @@
   <elmah>
     <security allowRemoteAccess="false" />
   </elmah>
-  <location path="elmah.axd" inheritInChildApplications="false">
-    <system.web>
-      <httpHandlers>
-        <add verb="POST,GET,HEAD" 
-             path="elmah.axd" 
-             type="Elmah.ErrorLogPageFactory, Elmah" />
-      </httpHandlers>
-      <!-- 
-        See http://code.google.com/p/elmah/wiki/SecuringErrorLogPages for 
-        more information on using ASP.NET authorization securing ELMAH.
-
-      <authorization>
-        <allow roles="admin" />
-        <deny users="*" />  
-      </authorization>
-      -->  
-    </system.web>
-    <system.webServer>
-      <handlers>
-        <add name="ELMAH"
-             verb="POST,GET,HEAD"
-             path="elmah.axd" 
-             type="Elmah.ErrorLogPageFactory, Elmah"
-             preCondition="integratedMode" />
-      </handlers>
-    </system.webServer>
-  </location>
 </configuration>
