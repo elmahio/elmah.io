@@ -1,7 +1,7 @@
 ﻿using AutoFixture;
 using Elmah.Io.Client;
 using Elmah.Io.Client.Models;
-using Moq;
+using NSubstitute;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
@@ -16,7 +16,7 @@ namespace Elmah.Io.Tests
     {
         private Fixture _fixture;
         private ErrorLog _errorLog;
-        Mock<IMessages> _messagesMock;
+        IMessages _messagesMock;
         private Guid _logId;
 
         [SetUp]
@@ -25,10 +25,10 @@ namespace Elmah.Io.Tests
             _fixture = new Fixture();
             _logId = _fixture.Create<Guid>();
             ErrorLog.Api = null;
-            var clientMock = new Mock<IElmahioAPI>();
-            _messagesMock = new Mock<IMessages>();
-            clientMock.Setup(x => x.Messages).Returns(_messagesMock.Object);
-            _errorLog = new ErrorLog(clientMock.Object, _logId);
+            var clientMock = Substitute.For<IElmahioAPI>();
+            _messagesMock = Substitute.For<IMessages>();
+            clientMock.Messages.Returns(_messagesMock);
+            _errorLog = new ErrorLog(clientMock, _logId);
         }
 
         [Test]
@@ -40,13 +40,13 @@ namespace Elmah.Io.Tests
             Guid? actualLogId = null;
 
             _messagesMock
-                .Setup(x => x.CreateAndNotifyAsync(It.IsAny<Guid>(), It.IsAny<CreateMessage>()))
-                .Callback<Guid, CreateMessage>((logId, msg) =>
+                .CreateAndNotifyAsync(Arg.Any<Guid>(), Arg.Any<CreateMessage>())
+                .Returns(Task.FromResult(new Message { Id = id }))
+                .AndDoes(x =>
                 {
-                    actualLogId = logId;
-                    actualMessage = msg;
-                })
-                .Returns(Task.FromResult(new Message { Id = id }));
+                    actualLogId = x.Arg<Guid>();
+                    actualMessage = x.Arg<CreateMessage>();
+                });
 
             var exception = new HttpParseException("message", new Exception(), "virtualPath", "sourceCode", 42);
 

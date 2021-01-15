@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using Elmah.Io.Client;
 using Elmah.Io.Client.Models;
 using Microsoft.Rest;
-using Moq;
+using NSubstitute;
 using NUnit.Framework;
 using AutoFixture;
 
@@ -16,7 +16,7 @@ namespace Elmah.Io.Tests
     {
         private Fixture _fixture;
         private ErrorLog _errorLog;
-        Mock<IMessages> _messagesMock;
+        IMessages _messagesMock;
         private Guid _logId;
 
         [SetUp]
@@ -25,10 +25,10 @@ namespace Elmah.Io.Tests
             _fixture = new Fixture();
             _logId = _fixture.Create<Guid>();
             ErrorLog.Api = null;
-            var clientMock = new Mock<IElmahioAPI>();
-            _messagesMock = new Mock<IMessages>();
-            clientMock.Setup(x => x.Messages).Returns(_messagesMock.Object);
-            _errorLog = new ErrorLog(clientMock.Object, _logId);
+            var clientMock = Substitute.For<IElmahioAPI>();
+            _messagesMock = Substitute.For<IMessages>();
+            clientMock.Messages.Returns(_messagesMock);
+            _errorLog = new ErrorLog(clientMock, _logId);
         }
 
         [Test]
@@ -41,13 +41,13 @@ namespace Elmah.Io.Tests
             Guid? actualLogId = null;
 
             _messagesMock
-                .Setup(x => x.CreateAndNotifyAsync(It.IsAny<Guid>(), It.IsAny<CreateMessage>()))
-                .Callback<Guid, CreateMessage>((logId, msg) =>
+                .CreateAndNotifyAsync(Arg.Any<Guid>(), Arg.Any<CreateMessage>())
+                .Returns(Task.FromResult(new Message { Id = id }))
+                .AndDoes(x =>
                 {
-                    actualLogId = logId;
-                    actualMessage = msg;
-                })
-                .Returns(Task.FromResult(new Message {Id = id}));
+                    actualLogId = x.Arg<Guid>();
+                    actualMessage = x.Arg<CreateMessage>();
+                });
 
             // Act
             var result = _errorLog.Log(new Error(new System.ApplicationException(logMessage)));
@@ -67,8 +67,8 @@ namespace Elmah.Io.Tests
             var logMessage = _fixture.Create<string>();
 
             _messagesMock
-                .Setup(x => x.GetWithHttpMessagesAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Dictionary<string, List<string>>>(), It.IsAny<CancellationToken>()))
-                .Returns(Task.FromResult(new HttpOperationResponse<Message> {Body = new Message { Id = id, Title = logMessage, DateTime = DateTime.UtcNow }}));
+                .GetWithHttpMessagesAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<Dictionary<string, List<string>>>(), Arg.Any<CancellationToken>())
+                .Returns(Task.FromResult(new HttpOperationResponse<Message> { Body = new Message { Id = id, Title = logMessage, DateTime = DateTime.UtcNow } }));
 
             // Act
             var result = _errorLog.GetError(id);
@@ -97,11 +97,9 @@ namespace Elmah.Io.Tests
             var taskCompletionSource = new TaskCompletionSource<HttpOperationResponse<MessagesResult>>(results);
             taskCompletionSource.SetResult(new HttpOperationResponse<MessagesResult> {Body = messages});
             _messagesMock
-                .Setup(
-                    x =>
-                        x.GetAllWithHttpMessagesAsync(It.IsAny<string>(), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<string>(),
-                            It.IsAny<DateTime?>(), It.IsAny<DateTime?>(), It.IsAny<bool?>(), It.IsAny<Dictionary<string,List<string>>>(),
-                            It.IsAny<CancellationToken>()))
+                .GetAllWithHttpMessagesAsync(Arg.Any<string>(), Arg.Any<int>(), Arg.Any<int>(), Arg.Any<string>(),
+                    Arg.Any<DateTime?>(), Arg.Any<DateTime?>(), Arg.Any<bool?>(), Arg.Any<Dictionary<string, List<string>>>(),
+                    Arg.Any<CancellationToken>())
                 .Returns(taskCompletionSource.Task);
 
             // Act
