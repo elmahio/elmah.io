@@ -19,7 +19,7 @@ jobs:
     - name: Restore
       run: nuget restore elmah.io.sln
     - name: Build
-      run: msbuild elmah.io.sln /t:Build /p:Configuration=Release
+      run: msbuild elmah.io.sln /t:Build /p:Configuration=Release /p:Version=3.7.${{ github.run_number }}
     - name: Test
       run: dotnet vstest test\Elmah.Io.Tests\bin\Release\net472\Elmah.Io.Tests.dll
     - name: Pack Elmah.Io
