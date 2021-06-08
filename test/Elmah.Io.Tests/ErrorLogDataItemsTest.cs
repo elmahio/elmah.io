@@ -1,12 +1,9 @@
 ﻿using AutoFixture;
 using Elmah.Io.Client;
-using Elmah.Io.Client.Models;
 using NSubstitute;
 using NUnit.Framework;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using System.Web;
 
@@ -16,7 +13,7 @@ namespace Elmah.Io.Tests
     {
         private Fixture _fixture;
         private ErrorLog _errorLog;
-        IMessages _messagesMock;
+        private IMessagesClient _messagesMock;
         private Guid _logId;
 
         [SetUp]
@@ -26,7 +23,7 @@ namespace Elmah.Io.Tests
             _logId = _fixture.Create<Guid>();
             ErrorLog.Api = null;
             var clientMock = Substitute.For<IElmahioAPI>();
-            _messagesMock = Substitute.For<IMessages>();
+            _messagesMock = Substitute.For<IMessagesClient>();
             clientMock.Messages.Returns(_messagesMock);
             _errorLog = new ErrorLog(clientMock, _logId);
         }

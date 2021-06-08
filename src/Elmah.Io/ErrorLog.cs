@@ -8,7 +8,6 @@ using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using System.Web;
 using Elmah.Io.Client;
-using Elmah.Io.Client.Models;
 
 namespace Elmah.Io
 {
@@ -20,7 +19,7 @@ namespace Elmah.Io
 
         private readonly Guid _logId;
 
-        public static IMessages Client => Api.Messages;
+        public static IMessagesClient Client => Api.Messages;
 
         /// <summary>
         /// ELMAH doesn't use this constructor and it is only published in order for you to create
@@ -202,7 +201,7 @@ namespace Elmah.Io
                 Message = message.Title,
                 Source = message.Source,
                 StatusCode = message.StatusCode ?? 0,
-                Time = message.DateTime.Value,
+                Time = message.DateTime.Value.DateTime,
                 Type = message.Type,
                 User = message.User,
             };
@@ -226,7 +225,7 @@ namespace Elmah.Io
                 Message = message.Title,
                 Source = message.Source,
                 StatusCode = message.StatusCode ?? 0,
-                Time = message.DateTime.Value,
+                Time = message.DateTime.Value.DateTime,
                 Type = message.Type,
                 User = message.User,
             };

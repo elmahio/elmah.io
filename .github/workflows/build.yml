@@ -19,26 +19,26 @@ jobs:
     - name: Restore
       run: nuget restore elmah.io.sln
     - name: Build
-      run: msbuild elmah.io.sln /t:Build /p:Configuration=Release /p:Version=3.7.${{ github.run_number }}
+      run: msbuild elmah.io.sln /t:Build /p:Configuration=Release /p:Version=4.0.${{ github.run_number }}-pre
     - name: Test
       run: dotnet vstest test\Elmah.Io.Tests\bin\Release\net472\Elmah.Io.Tests.dll
     - name: Pack Elmah.Io
-      run: nuget pack Elmah.Io.nuspec -Version 3.7.${{ github.run_number }} -Properties Configuration=Release -Properties Commit=${{ github.sha }}
+      run: nuget pack Elmah.Io.nuspec -Version 4.0.${{ github.run_number }}-pre -Properties Configuration=Release -Properties Commit=${{ github.sha }}
     - name: Pack Elmah.Io.AspNet
-      run: nuget pack Elmah.Io.AspNet.nuspec -Version 3.7.${{ github.run_number }} -Properties Configuration=Release -Properties Commit=${{ github.sha }}
+      run: nuget pack Elmah.Io.AspNet.nuspec -Version 4.0.${{ github.run_number }}-pre -Properties Configuration=Release -Properties Commit=${{ github.sha }}
     - name: Pack Elmah.Io.Mvc
-      run: nuget pack Elmah.Io.Mvc.nuspec -Version 3.7.${{ github.run_number }} -Properties Configuration=Release -Properties Commit=${{ github.sha }}
+      run: nuget pack Elmah.Io.Mvc.nuspec -Version 4.0.${{ github.run_number }}-pre -Properties Configuration=Release -Properties Commit=${{ github.sha }}
     - name: Pack Elmah.Io.WebApi
-      run: nuget pack Elmah.Io.WebApi.nuspec -Version 3.7.${{ github.run_number }} -Properties Configuration=Release -Properties Commit=${{ github.sha }}
+      run: nuget pack Elmah.Io.WebApi.nuspec -Version 4.0.${{ github.run_number }}-pre -Properties Configuration=Release -Properties Commit=${{ github.sha }}
     - name: Push Elmah.Io
-      run: dotnet nuget push Elmah.Io.3.7.${{ github.run_number }}.nupkg --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json
+      run: dotnet nuget push Elmah.Io.4.0.${{ github.run_number }}-pre.nupkg --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json
       if: ${{ github.event_name == 'push' }}
     - name: Push Elmah.Io.AspNet
-      run: dotnet nuget push Elmah.Io.AspNet.3.7.${{ github.run_number }}.nupkg --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json
+      run: dotnet nuget push Elmah.Io.AspNet.4.0.${{ github.run_number }}-pre.nupkg --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json
       if: ${{ github.event_name == 'push' }}
     - name: Push Elmah.Io.Mvc
-      run: dotnet nuget push Elmah.Io.Mvc.3.7.${{ github.run_number }}.nupkg --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json
+      run: dotnet nuget push Elmah.Io.Mvc.4.0.${{ github.run_number }}-pre.nupkg --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json
       if: ${{ github.event_name == 'push' }}
     - name: Push Elmah.Io.WebApi
-      run: dotnet nuget push Elmah.Io.WebApi.3.7.${{ github.run_number }}.nupkg --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json
+      run: dotnet nuget push Elmah.Io.WebApi.4.0.${{ github.run_number }}-pre.nupkg --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json
       if: ${{ github.event_name == 'push' }}

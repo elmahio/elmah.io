@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Elmah.Io.Client;
-using Elmah.Io.Client.Models;
 using Microsoft.Rest;
 using NSubstitute;
 using NUnit.Framework;
@@ -16,7 +15,7 @@ namespace Elmah.Io.Tests
     {
         private Fixture _fixture;
         private ErrorLog _errorLog;
-        IMessages _messagesMock;
+        private IMessagesClient _messagesClientMock;
         private Guid _logId;
 
         [SetUp]
@@ -26,8 +25,8 @@ namespace Elmah.Io.Tests
             _logId = _fixture.Create<Guid>();
             ErrorLog.Api = null;
             var clientMock = Substitute.For<IElmahioAPI>();
-            _messagesMock = Substitute.For<IMessages>();
-            clientMock.Messages.Returns(_messagesMock);
+            _messagesClientMock = Substitute.For<IMessagesClient>();
+            clientMock.Messages.Returns(_messagesClientMock);
             _errorLog = new ErrorLog(clientMock, _logId);
         }
 
@@ -40,7 +39,7 @@ namespace Elmah.Io.Tests
             CreateMessage actualMessage = null;
             Guid? actualLogId = null;
 
-            _messagesMock
+            _messagesClientMock
                 .CreateAndNotifyAsync(Arg.Any<Guid>(), Arg.Any<CreateMessage>())
                 .Returns(Task.FromResult(new Message { Id = id }))
                 .AndDoes(x =>
@@ -66,9 +65,9 @@ namespace Elmah.Io.Tests
             var id = _fixture.Create<string>();
             var logMessage = _fixture.Create<string>();
 
-            _messagesMock
-                .GetWithHttpMessagesAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<Dictionary<string, List<string>>>(), Arg.Any<CancellationToken>())
-                .Returns(Task.FromResult(new HttpOperationResponse<Message> { Body = new Message { Id = id, Title = logMessage, DateTime = DateTime.UtcNow } }));
+            _messagesClientMock
+                .GetAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<CancellationToken>())
+                .Returns(new Message { Id = id, Title = logMessage, DateTime = DateTime.UtcNow });
 
             // Act
             var result = _errorLog.GetError(id);
@@ -96,11 +95,10 @@ namespace Elmah.Io.Tests
 
             var taskCompletionSource = new TaskCompletionSource<HttpOperationResponse<MessagesResult>>(results);
             taskCompletionSource.SetResult(new HttpOperationResponse<MessagesResult> {Body = messages});
-            _messagesMock
-                .GetAllWithHttpMessagesAsync(Arg.Any<string>(), Arg.Any<int>(), Arg.Any<int>(), Arg.Any<string>(),
-                    Arg.Any<DateTime?>(), Arg.Any<DateTime?>(), Arg.Any<bool?>(), Arg.Any<Dictionary<string, List<string>>>(),
-                    Arg.Any<CancellationToken>())
-                .Returns(taskCompletionSource.Task);
+            _messagesClientMock
+                .GetAllAsync(Arg.Any<string>(), Arg.Any<int?>(), Arg.Any<int?>(), Arg.Any<string>(),
+                    Arg.Any<DateTimeOffset?>(), Arg.Any<DateTimeOffset?>(), Arg.Any<bool?>(), Arg.Any<CancellationToken>())
+                .Returns(messages);
 
             // Act
             var count = _errorLog.GetErrors(pageIndex, pageSize, results);
