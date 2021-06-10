@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Elmah.Io.Client;
-using Microsoft.Rest;
 using NSubstitute;
 using NUnit.Framework;
 using AutoFixture;
@@ -93,8 +92,6 @@ namespace Elmah.Io.Tests
             };
             var results = new ArrayList();
 
-            var taskCompletionSource = new TaskCompletionSource<HttpOperationResponse<MessagesResult>>(results);
-            taskCompletionSource.SetResult(new HttpOperationResponse<MessagesResult> {Body = messages});
             _messagesClientMock
                 .GetAllAsync(Arg.Any<string>(), Arg.Any<int?>(), Arg.Any<int?>(), Arg.Any<string>(),
                     Arg.Any<DateTimeOffset?>(), Arg.Any<DateTimeOffset?>(), Arg.Any<bool?>(), Arg.Any<CancellationToken>())
