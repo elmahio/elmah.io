@@ -21,16 +21,15 @@ namespace Elmah.Io.Tests
         {
             // Arrange
             var configUri = _fixture.Create<Uri>();
-            var errorLog =
-                new ErrorLog(new Hashtable
-                {
-                    {"logId", _fixture.Create<Guid>().ToString()},
-                    {"apiKey", "MyKey"},
-                    {"url", configUri.ToString()}
-                });
+            new ErrorLog(new Hashtable
+            {
+                {"logId", _fixture.Create<Guid>().ToString()},
+                {"apiKey", "MyKey"},
+                {"url", configUri.ToString()}
+            });
 
             // Act
-            var uri = ErrorLog.Api.BaseUri;
+            var uri = ErrorLog.Api.HttpClient.BaseAddress;
 
             // Assert
             Assert.That(uri, Is.EqualTo(configUri));

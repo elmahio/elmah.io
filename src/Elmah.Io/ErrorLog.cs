@@ -56,13 +56,13 @@ namespace Elmah.Io
 
             var url = config.Url();
 
-            var elmahioApi = (ElmahioAPI)ElmahioAPI.Create(apiKey);
+            var elmahioApi = ElmahioAPI.Create(apiKey);
             elmahioApi.HttpClient.Timeout = new TimeSpan(0, 0, 5);
             elmahioApi.HttpClient.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue(new ProductHeaderValue("Elmah.Io", _assemblyVersion)));
 
             if (url != null)
             {
-                elmahioApi.BaseUri = url;
+                elmahioApi.HttpClient.BaseAddress = url;
             }
 
             Api = elmahioApi;
