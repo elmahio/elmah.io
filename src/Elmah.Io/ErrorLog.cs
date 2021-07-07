@@ -14,6 +14,7 @@ namespace Elmah.Io
     public class ErrorLog : global::Elmah.ErrorLog, IErrorLog
     {
         internal static string _assemblyVersion = typeof(ErrorLog).Assembly.GetName().Version.ToString();
+        internal static string _systemWebAssemblyVersion = typeof(HttpApplication).Assembly.GetName().Version.ToString();
 
         public static IElmahioAPI Api;
 
@@ -59,6 +60,7 @@ namespace Elmah.Io
             var elmahioApi = ElmahioAPI.Create(apiKey);
             elmahioApi.HttpClient.Timeout = new TimeSpan(0, 0, 5);
             elmahioApi.HttpClient.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue(new ProductHeaderValue("Elmah.Io", _assemblyVersion)));
+            elmahioApi.HttpClient.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue(new ProductHeaderValue("System.Web", _systemWebAssemblyVersion)));
 
             if (url != null)
             {
