@@ -21,8 +21,10 @@
     <repository type="git" url="https://github.com/elmahio/elmah.io" commit="$commit$" />
     <iconUrl>https://secure.gravatar.com/avatar/5c4cb3646528821117abde6d2d5ee22d?s=64</iconUrl>
     <tags>Error Exception Reporting Management Logging ELMAH Diagnostics Tracing</tags>
+    <readme>README.md</readme>
   </metadata>
   <files>
+    <file src="README.md" target="README.md" />
     <file src="nuget\images\icon.png" target="icon.png" />
     <file src="nuget\content\web.config.transform" target="content\web.config.transform" />
     <file src="nuget\content\web.config.install.xdt" target="content\web.config.install.xdt" />
