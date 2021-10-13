@@ -5,6 +5,7 @@ using System.Collections.Specialized;
 using System.Linq;
 using System.Net.Http.Headers;
 using System.Runtime.InteropServices;
+using System.Text;
 using System.Threading.Tasks;
 using System.Web;
 using Elmah.Io.Client;
@@ -55,17 +56,11 @@ namespace Elmah.Io
 
             if (Api != null) return;
 
-            var url = config.Url();
-
-            var elmahioApi = ElmahioAPI.Create(apiKey);
-            elmahioApi.HttpClient.Timeout = new TimeSpan(0, 0, 5);
-            elmahioApi.HttpClient.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue(new ProductHeaderValue("Elmah.Io", _assemblyVersion)));
-            elmahioApi.HttpClient.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue(new ProductHeaderValue("System.Web", _systemWebAssemblyVersion)));
-
-            if (url != null)
+            var elmahioApi = ElmahioAPI.Create(apiKey, new ElmahIoOptions
             {
-                elmahioApi.HttpClient.BaseAddress = url;
-            }
+                Timeout = new TimeSpan(0, 0, 5),
+                UserAgent = UserAgent(),
+            });
 
             Api = elmahioApi;
         }
@@ -282,6 +277,15 @@ namespace Elmah.Io
             }
 
             return items;
+        }
+
+        private string UserAgent()
+        {
+            return new StringBuilder()
+                .Append(new ProductInfoHeaderValue(new ProductHeaderValue("Elmah.Io", _assemblyVersion)).ToString())
+                .Append(" ")
+                .Append(new ProductInfoHeaderValue(new ProductHeaderValue("System.Web", _systemWebAssemblyVersion)).ToString())
+                .ToString();
         }
     }
 }

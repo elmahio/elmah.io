@@ -20,25 +20,6 @@ namespace Elmah.Io
             return (string) (k == null ? null : dictionary[k]);
         }
 
-        internal static Uri Url(this IDictionary dictionary)
-        {
-            const string url = "url";
-
-            if (!dictionary.ContainsCaseInsensitive(url))
-            {
-                return null;
-            }
-
-            Uri uri;
-            if (!Uri.TryCreate(dictionary.ValueByKeyCaseInsensitive(url), UriKind.Absolute, out uri))
-            {
-                throw new System.ApplicationException(
-                    "Invalid URL. Please specify a valid absolute url. In fact you don't even need to specify an url, which will make the error logger use the elmah.io backend.");
-            }
-
-            return new Uri(dictionary.ValueByKeyCaseInsensitive(url));
-        }
-
         internal static Guid LogId(this IDictionary dictionary)
         {
             const string logid = "logId";

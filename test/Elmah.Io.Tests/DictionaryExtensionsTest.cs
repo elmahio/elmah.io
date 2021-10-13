@@ -22,29 +22,6 @@ namespace Elmah.Io.Tests
             Assert.That(dictionary.ApplicationName(), Is.EqualTo(expectedValue));
         }
 
-        [TestCase(false, "http://localhost", "url", "http://localhost")]
-        [TestCase(false, "http://localhost", "Url", "http://localhost")]
-        [TestCase(false, null, null, null)]
-        [TestCase(true, null, "url", "no url")]
-        [TestCase(true, null, "url", "/relative/url")]
-        public void CanGetUrl(bool shouldThrowException, string expectedUrl, string key, string value)
-        {
-            var dictionary = new Hashtable();
-            if (!string.IsNullOrWhiteSpace(key))
-            {
-                dictionary.Add(key, value);
-            }
-
-            if (shouldThrowException)
-            {
-                Assert.Throws<System.ApplicationException>(() => dictionary.Url());
-            }
-            else
-            {
-                Assert.That(dictionary.Url(), Is.EqualTo(string.IsNullOrWhiteSpace(expectedUrl) ? null : new Uri(expectedUrl)));
-            }
-        }
-
         [TestCase(false, "DC14639C-B930-4960-9A3A-BD73C6CA6375", "logId", "DC14639C-B930-4960-9A3A-BD73C6CA6375")]
         [TestCase(false, "E70628F4-EEED-4C06-B570-663F8AFA80E5", "LogId", "E70628F4-EEED-4C06-B570-663F8AFA80E5")]
         [TestCase(true, null, "logId", "No guid")]
