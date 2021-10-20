@@ -43,7 +43,7 @@ namespace Elmah.Io
                 if (value == null)
                 {
                     throw new System.ApplicationException(
-                        "You are trying to reference a AppSetting which is not found (key = '" + appSettingsKey + "'");
+                        "You are trying to reference an AppSetting which is not found (key = '" + appSettingsKey + "'");
                 }
 
                 Guid result;
