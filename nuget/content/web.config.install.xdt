@@ -1,6 +1,6 @@
 <configuration xmlns:xdt="http://schemas.microsoft.com/XML-Document-Transform">
   <elmah>
     <errorLog xdt:Transform="InsertIfMissing" />
-    <errorLog type="Elmah.Io.ErrorLog, Elmah.Io" apiKey="ELMAH_IO_API_KEY" logId="ELMAH_IO_LOG_ID" xdt:Transform="Replace" />
+    <errorLog type="Elmah.Io.ErrorLog, Elmah.Io" apiKey="ELMAH_IO_API_KEY" logId="ELMAH_IO_LOG_ID" xdt:Transform="Replace" xdt:Locator="Condition(not(starts-with(@type, 'Elmah.Io.ErrorLog')))" />
   </elmah>
 </configuration>
