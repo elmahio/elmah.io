@@ -13,7 +13,7 @@ using Elmah.Io.Client;
 namespace Elmah.Io
 {
     /// <summary>
-    /// ELMAH ErrorLog implementation that logs error to elmah.io.
+    /// <see cref="ErrorLog"/>
     /// </summary>
     public class ErrorLog : global::Elmah.ErrorLog, IErrorLog
     {
@@ -75,16 +75,15 @@ namespace Elmah.Io
         }
 
         /// <summary>
-        /// Log an error to elmah.io.
+        /// <see cref="IErrorLog.Log(Error)"/>
         /// </summary>
-        /// <returns>The assigned elmah.io ID for the created error.</returns>
         public override string Log(Error error)
         {
             return EndLog(BeginLog(error, null, null));
         }
 
         /// <summary>
-        /// Asynchronous version of the Log method.
+        /// <see cref="IErrorLog.BeginLog(Error, AsyncCallback, object)"/>
         /// </summary>
         public override IAsyncResult BeginLog(Error error, AsyncCallback asyncCallback, object asyncState)
         {
@@ -112,7 +111,7 @@ namespace Elmah.Io
         }
 
         /// <summary>
-        /// Asynchronous version of the Log method.
+        /// <see cref="IErrorLog.EndLog(IAsyncResult)"/>
         /// </summary>
         public override string EndLog(IAsyncResult asyncResult)
         {
@@ -121,7 +120,7 @@ namespace Elmah.Io
         }
 
         /// <summary>
-        /// Asynchronous version of the GetError method.
+        /// <see cref="IErrorLog.BeginGetError(string, AsyncCallback, object)"/>
         /// </summary>
         public override IAsyncResult BeginGetError(string id, AsyncCallback asyncCallback, object asyncState)
         {
@@ -133,7 +132,7 @@ namespace Elmah.Io
         }
 
         /// <summary>
-        /// Asynchronous version of the GetError method.
+        /// <see cref="IErrorLog.EndGetError(IAsyncResult)"/>
         /// </summary>
         public override ErrorLogEntry EndGetError(IAsyncResult asyncResult)
         {
@@ -144,7 +143,7 @@ namespace Elmah.Io
         }
 
         /// <summary>
-        /// Return an error in elmah.io from its ID.
+        /// <see cref="IErrorLog.GetError(string)"/>
         /// </summary>
         public override ErrorLogEntry GetError(string id)
         {
@@ -152,7 +151,7 @@ namespace Elmah.Io
         }
 
         /// <summary>
-        /// Asynchronous version of the GetErrors method.
+        /// <see cref="IErrorLog.BeginGetErrors(int, int, IList, AsyncCallback, object)"/>
         /// </summary>
         public override IAsyncResult BeginGetErrors(int pageIndex, int pageSize, IList errorEntryList, AsyncCallback asyncCallback, object asyncState)
         {
@@ -164,7 +163,7 @@ namespace Elmah.Io
         }
 
         /// <summary>
-        /// Asynchronous version of the GetErrors method.
+        /// <see cref="IErrorLog.EndGetErrors(IAsyncResult)"/>
         /// </summary>
         public override int EndGetErrors(IAsyncResult asyncResult)
         {
@@ -183,7 +182,7 @@ namespace Elmah.Io
         }
 
         /// <summary>
-        /// Get a list of errors in elmah.io.
+        /// <see cref="IErrorLog.GetErrors(int, int, IList)"/>
         /// </summary>
         public override int GetErrors(int pageIndex, int pageSize, IList errorEntryList)
         {
