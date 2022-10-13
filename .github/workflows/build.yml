@@ -38,13 +38,13 @@ jobs:
     - name: Install dotnet-validate
       run: dotnet tool install --global dotnet-validate --version 0.0.1-preview.304
     - name: Validate Elmah.Io
-      run: dotnet-validate package local Elmah.Io.4.3.${{ github.run_number }}-pre.nupkg
+      run: dotnet-validate package local elmah.io.4.3.${{ github.run_number }}-pre.nupkg
     - name: Validate Elmah.Io.AspNet
-      run: dotnet-validate package local Elmah.Io.AspNet.4.3.${{ github.run_number }}-pre.nupkg
+      run: dotnet-validate package local elmah.io.aspnet.4.3.${{ github.run_number }}-pre.nupkg
     - name: Validate Elmah.Io.Mvc
-      run: dotnet-validate package local Elmah.Io.Mvc.4.3.${{ github.run_number }}-pre.nupkg
+      run: dotnet-validate package local elmah.io.mvc.4.3.${{ github.run_number }}-pre.nupkg
     - name: Validate Elmah.Io.WebApi
-      run: dotnet-validate package local Elmah.Io.WebApi.4.3.${{ github.run_number }}-pre.nupkg
+      run: dotnet-validate package local elmah.io.webapi.4.3.${{ github.run_number }}-pre.nupkg
 
     - name: Push Elmah.Io
       run: dotnet nuget push Elmah.Io.4.3.${{ github.run_number }}-pre.nupkg --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json
