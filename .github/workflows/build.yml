@@ -19,7 +19,7 @@ jobs:
         dotnet-version: 6.0.x
     - uses: nuget/setup-nuget@v1
     - name: Add msbuild to PATH
-      uses: microsoft/setup-msbuild@v1.0.2
+      uses: microsoft/setup-msbuild@v1.1.3
     - name: Restore
       run: nuget restore elmah.io.sln
     - name: Build
