@@ -2,6 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>net45</TargetFramework>
+    <EnablePackageValidation>true</EnablePackageValidation>
     <!-- Version updated through GitHub Actions -->
     <Version>1.0.0</Version>
     <!-- SourceLink -->
