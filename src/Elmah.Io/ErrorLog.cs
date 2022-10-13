@@ -12,15 +12,24 @@ using Elmah.Io.Client;
 
 namespace Elmah.Io
 {
+    /// <summary>
+    /// ELMAH ErrorLog implementation that logs error to elmah.io.
+    /// </summary>
     public class ErrorLog : global::Elmah.ErrorLog, IErrorLog
     {
         internal static string _assemblyVersion = typeof(ErrorLog).Assembly.GetName().Version.ToString();
         internal static string _systemWebAssemblyVersion = typeof(HttpApplication).Assembly.GetName().Version.ToString();
 
+        /// <summary>
+        /// The IElmahioAPI from the Elmah.Io.Client package that is used internally in this error log.
+        /// </summary>
         public static IElmahioAPI Api;
 
         private readonly Guid _logId;
 
+        /// <summary>
+        /// The IMessagesClient from the Elmah.Io.Client package that is used internally in this error log.
+        /// </summary>
         public static IMessagesClient Client => Api.Messages;
 
         /// <summary>
@@ -65,11 +74,18 @@ namespace Elmah.Io
             Api = elmahioApi;
         }
 
+        /// <summary>
+        /// Log an error to elmah.io.
+        /// </summary>
+        /// <returns>The assigned elmah.io ID for the created error.</returns>
         public override string Log(Error error)
         {
             return EndLog(BeginLog(error, null, null));
         }
 
+        /// <summary>
+        /// Asynchronous version of the Log method.
+        /// </summary>
         public override IAsyncResult BeginLog(Error error, AsyncCallback asyncCallback, object asyncState)
         {
             var tcs = new TaskCompletionSource<Message>(asyncState);
@@ -95,12 +111,18 @@ namespace Elmah.Io
             return tcs.Task;
         }
 
+        /// <summary>
+        /// Asynchronous version of the Log method.
+        /// </summary>
         public override string EndLog(IAsyncResult asyncResult)
         {
             var message = EndImpl<Message>(asyncResult);
             return message?.Id;
         }
 
+        /// <summary>
+        /// Asynchronous version of the GetError method.
+        /// </summary>
         public override IAsyncResult BeginGetError(string id, AsyncCallback asyncCallback, object asyncState)
         {
             var tcs = new TaskCompletionSource<Message>(asyncState);
@@ -110,6 +132,9 @@ namespace Elmah.Io
             return tcs.Task;
         }
 
+        /// <summary>
+        /// Asynchronous version of the GetError method.
+        /// </summary>
         public override ErrorLogEntry EndGetError(IAsyncResult asyncResult)
         {
             var message = EndImpl<Message>(asyncResult);
@@ -118,11 +143,17 @@ namespace Elmah.Io
             return errorLogEntry;
         }
 
+        /// <summary>
+        /// Return an error in elmah.io from its ID.
+        /// </summary>
         public override ErrorLogEntry GetError(string id)
         {
             return EndGetError(BeginGetError(id, null, null));
         }
 
+        /// <summary>
+        /// Asynchronous version of the GetErrors method.
+        /// </summary>
         public override IAsyncResult BeginGetErrors(int pageIndex, int pageSize, IList errorEntryList, AsyncCallback asyncCallback, object asyncState)
         {
             var tcs = new TaskCompletionSource<MessagesResult>(errorEntryList);
@@ -132,6 +163,9 @@ namespace Elmah.Io
             return tcs.Task;
         }
 
+        /// <summary>
+        /// Asynchronous version of the GetErrors method.
+        /// </summary>
         public override int EndGetErrors(IAsyncResult asyncResult)
         {
             var messagesResult = EndImpl<MessagesResult>(asyncResult);
@@ -148,6 +182,9 @@ namespace Elmah.Io
             return messagesResult.Total ?? 0;
         }
 
+        /// <summary>
+        /// Get a list of errors in elmah.io.
+        /// </summary>
         public override int GetErrors(int pageIndex, int pageSize, IList errorEntryList)
         {
             return EndGetErrors(BeginGetErrors(pageIndex, pageSize, errorEntryList, null, null));
