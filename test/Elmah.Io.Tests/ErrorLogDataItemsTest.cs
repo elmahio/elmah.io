@@ -4,6 +4,7 @@ using NSubstitute;
 using NUnit.Framework;
 using System;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Web;
 
@@ -37,7 +38,7 @@ namespace Elmah.Io.Tests
             Guid? actualLogId = null;
 
             _messagesMock
-                .CreateAndNotifyAsync(Arg.Any<Guid>(), Arg.Any<CreateMessage>())
+                .CreateAndNotifyAsync(Arg.Any<Guid>(), Arg.Any<CreateMessage>(), Arg.Any<CancellationToken>())
                 .Returns(Task.FromResult(new Message { Id = id }))
                 .AndDoes(x =>
                 {
