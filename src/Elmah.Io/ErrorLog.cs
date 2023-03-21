@@ -105,7 +105,7 @@ namespace Elmah.Io
                     Type = error.Type,
                     User = error.User,
                     Data = Data(error.Exception),
-                })
+                }, default)
                 .ContinueWith(t => Continue(asyncCallback, t, tcs));
             return tcs.Task;
         }
