@@ -7,7 +7,7 @@
     <dependencies>
       <group targetFramework=".NETFramework4.5">
         <dependency id="elmah.corelibrary" version="1.2.2" />
-        <dependency id="Elmah.Io.Client" version="[4.4.56,5)" />
+        <dependency id="Elmah.Io.Client" version="[5.0.58-pre,6)" />
         <dependency id="Elmah.MVC" version="2.1.2" />
       </group>
     </dependencies>
