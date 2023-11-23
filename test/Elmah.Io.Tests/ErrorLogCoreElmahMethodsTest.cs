@@ -94,7 +94,7 @@ namespace Elmah.Io.Tests
 
             _messagesClientMock
                 .GetAllAsync(Arg.Any<string>(), Arg.Any<int?>(), Arg.Any<int?>(), Arg.Any<string>(),
-                    Arg.Any<DateTimeOffset?>(), Arg.Any<DateTimeOffset?>(), Arg.Any<bool?>(), Arg.Any<CancellationToken>())
+                    Arg.Any<DateTimeOffset?>(), Arg.Any<DateTimeOffset?>(), Arg.Any<bool?>(), Arg.Any<string>(), Arg.Any<CancellationToken>())
                 .Returns(messages);
 
             // Act
