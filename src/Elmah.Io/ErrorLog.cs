@@ -17,8 +17,8 @@ namespace Elmah.Io
     /// </summary>
     public class ErrorLog : global::Elmah.ErrorLog, IErrorLog
     {
-        internal static string _assemblyVersion = typeof(ErrorLog).Assembly.GetName().Version.ToString();
-        internal static string _systemWebAssemblyVersion = typeof(HttpApplication).Assembly.GetName().Version.ToString();
+        internal static readonly string _assemblyVersion = typeof(ErrorLog).Assembly.GetName().Version.ToString();
+        internal static readonly string _systemWebAssemblyVersion = typeof(HttpApplication).Assembly.GetName().Version.ToString();
 
         /// <summary>
         /// The IElmahioAPI from the Elmah.Io.Client package that is used internally in this error log.
@@ -196,8 +196,7 @@ namespace Elmah.Io
                 throw new ArgumentNullException(nameof(asyncResult));
             }
 
-            var task = asyncResult as Task<T>;
-            if (task == null)
+            if (!(asyncResult is Task<T> task))
             {
                 throw new ArgumentException(null, nameof(asyncResult));
             }
@@ -287,7 +286,7 @@ namespace Elmah.Io
 
         private IList<Item> Data(Exception exception)
         {
-            if (exception == null) return null;
+            if (exception == null) return new List<Item>();
             var items = new List<Item>();
             var dataItems = exception.ToDataList();
             if (dataItems.Count > 0)

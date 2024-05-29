@@ -49,7 +49,7 @@ namespace Elmah.Io.Tests
             var exception = new HttpParseException("message", new Exception(), "virtualPath", "sourceCode", 42);
 
             // Act
-            var result = _errorLog.Log(new Error(exception));
+            _errorLog.Log(new Error(exception));
 
             // Assert
             Assert.That(actualMessage, Is.Not.Null);

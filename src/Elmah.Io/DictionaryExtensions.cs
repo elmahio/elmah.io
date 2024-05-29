@@ -20,6 +20,10 @@ namespace Elmah.Io
             return (string) (k == null ? null : dictionary[k]);
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage(
+            "Major Code Smell",
+            "S112:General or reserved exceptions should never be thrown",
+            Justification = "Ignoring use of ApplicationException for now. We may want to consider changing the exception type on a major version upgrade")]
         internal static Guid LogId(this IDictionary dictionary)
         {
             const string logid = "logId";
@@ -27,8 +31,7 @@ namespace Elmah.Io
 
             if (dictionary.ContainsCaseInsensitive(logid))
             {
-                Guid result;
-                if (!Guid.TryParse(dictionary.ValueByKeyCaseInsensitive(logid), out result))
+                if (!Guid.TryParse(dictionary.ValueByKeyCaseInsensitive(logid), out Guid result))
                 {
                     throw new System.ApplicationException(
                         "Invalid log ID. Please specify a valid log ID in your web.config like this: <errorLog type=\"Elmah.Io.ErrorLog, Elmah.Io\" logId=\"98895825-2516-43DE-B514-FFB39EA89A65\" apiKey=\"5ac68b71ddca4201bbf21991964ac29e\" />");
@@ -39,15 +42,9 @@ namespace Elmah.Io
             if (dictionary.ContainsCaseInsensitive(logidkey))
             {
                 var appSettingsKey = dictionary.ValueByKeyCaseInsensitive(logidkey);
-                var value = ConfigurationManager.AppSettings.Get(appSettingsKey);
-                if (value == null)
-                {
-                    throw new System.ApplicationException(
-                        "You are trying to reference an AppSetting which is not found (key = '" + appSettingsKey + "'");
-                }
+                var value = ConfigurationManager.AppSettings.Get(appSettingsKey) ?? throw new System.ApplicationException("You are trying to reference an AppSetting which is not found (key = '" + appSettingsKey + "'");
 
-                Guid result;
-                if (!Guid.TryParse(value, out result))
+                if (!Guid.TryParse(value, out Guid result))
                 {
                     throw new System.ApplicationException(
                         "Invalid LogId. Please specify a valid LogId in your web.config like this: <appSettings><add key=\""
@@ -61,6 +58,10 @@ namespace Elmah.Io
                 "Missing LogId or LogIdKey. Please specify a LogId in your web.config like this: <errorLog type=\"Elmah.Io.ErrorLog, Elmah.Io\" LogId=\"98895825-2516-43DE-B514-FFB39EA89A65\" apiKey=\"bc9c62543e35450495223f9934ed75cd\" />.");
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage(
+            "Major Code Smell",
+            "S112:General or reserved exceptions should never be thrown",
+            Justification = "Ignoring use of ApplicationException for now. We may want to consider changing the exception type on a major version upgrade")]
         internal static string ApiKey(this IDictionary dictionary)
         {
             const string apikey = "apiKey";
@@ -75,13 +76,7 @@ namespace Elmah.Io
             {
 
                 var appSettingsKey = dictionary.ValueByKeyCaseInsensitive(apikeykey);
-                var value = ConfigurationManager.AppSettings.Get(appSettingsKey);
-                if (value == null)
-                {
-                    throw new System.ApplicationException(
-                        "You are trying to reference a AppSetting which is not found (key = '" + appSettingsKey + "'");
-                }
-
+                var value = ConfigurationManager.AppSettings.Get(appSettingsKey) ?? throw new System.ApplicationException("You are trying to reference a AppSetting which is not found (key = '" + appSettingsKey + "'");
                 return value;
             }
 
