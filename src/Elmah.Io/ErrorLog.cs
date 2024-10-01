@@ -16,6 +16,9 @@ namespace Elmah.Io
     /// <summary>
     /// <see cref="ErrorLog"/>
     /// </summary>
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Major Code Smell", "S2223", Justification = "The public Api field is kept for backwards compatibility")]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Major Code Smell", "S1104", Justification = "The public Api field is kept for backwards compatibility")]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Major Code Smell", "S3010", Justification = "The public Api field is kept for backwards compatibility")]
     public class ErrorLog : global::Elmah.ErrorLog, IErrorLog
     {
         internal static readonly string _assemblyVersion = typeof(ErrorLog).Assembly.GetName().Version.ToString();
@@ -199,14 +202,14 @@ namespace Elmah.Io
             return EndGetErrors(BeginGetErrors(pageIndex, pageSize, errorEntryList, null, null));
         }
 
-        private T EndImpl<T>(IAsyncResult asyncResult)
+        private static T EndImpl<T>(IAsyncResult asyncResult)
         {
             if (asyncResult == null)
             {
                 throw new ArgumentNullException(nameof(asyncResult));
             }
 
-            if (!(asyncResult is Task<T> task))
+            if (asyncResult is not Task<T> task)
             {
                 throw new ArgumentException(null, nameof(asyncResult));
             }
@@ -248,10 +251,10 @@ namespace Elmah.Io
                 User = message.User,
             };
 
-            (message.Cookies ?? new List<Item>()).ToList().ForEach(c => error.Cookies.Add(c.Key, c.Value));
-            (message.Form ?? new List<Item>()).ToList().ForEach(c => error.Form.Add(c.Key, c.Value));
-            (message.QueryString ?? new List<Item>()).ToList().ForEach(c => error.QueryString.Add(c.Key, c.Value));
-            (message.ServerVariables ?? new List<Item>()).ToList().ForEach(c => error.ServerVariables.Add(c.Key, c.Value));
+            (message.Cookies ?? []).ToList().ForEach(c => error.Cookies.Add(c.Key, c.Value));
+            (message.Form ?? []).ToList().ForEach(c => error.Form.Add(c.Key, c.Value));
+            (message.QueryString ?? []).ToList().ForEach(c => error.QueryString.Add(c.Key, c.Value));
+            (message.ServerVariables ?? []).ToList().ForEach(c => error.ServerVariables.Add(c.Key, c.Value));
 
             var errorLogEntry = new ErrorLogEntry(this, message.Id, error);
             return errorLogEntry;
@@ -296,7 +299,7 @@ namespace Elmah.Io
 
         private IList<Item> Data(Exception exception)
         {
-            if (exception == null) return new List<Item>();
+            if (exception == null) return [];
             var items = new List<Item>();
             var dataItems = exception.ToDataList();
             if (dataItems.Count > 0)
@@ -324,7 +327,7 @@ namespace Elmah.Io
             return items;
         }
 
-        private string UserAgent()
+        private static string UserAgent()
         {
             return new StringBuilder()
                 .Append(new ProductInfoHeaderValue(new ProductHeaderValue("Elmah.Io", _assemblyVersion)).ToString())
