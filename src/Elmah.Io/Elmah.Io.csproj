@@ -21,7 +21,7 @@
 
   <ItemGroup>
     <PackageReference Include="elmah.corelibrary" Version="1.2.2" />
-    <PackageReference Include="Elmah.Io.Client" Version="5.1.76" />
+    <PackageReference Include="Elmah.Io.Client" Version="5.2.77-pre" />
   </ItemGroup>
 
   <ItemGroup>
