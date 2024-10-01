@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
+using System.Net;
 using System.Net.Http.Headers;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -65,11 +66,20 @@ namespace Elmah.Io
 
             if (Api != null) return;
 
-            var elmahioApi = ElmahioAPI.Create(apiKey, new ElmahIoOptions
+            var options = new ElmahIoOptions
             {
                 Timeout = new TimeSpan(0, 0, 5),
                 UserAgent = UserAgent(),
-            });
+            };
+
+            var proxyHost = config.ProxyHost();
+            var proxyPort = config.ProxyPort();
+            if (proxyHost != null && proxyPort != null)
+            {
+                options.WebProxy = new WebProxy(proxyHost, (int)proxyPort);
+            }
+
+            var elmahioApi = ElmahioAPI.Create(apiKey, options);
 
             Api = elmahioApi;
         }

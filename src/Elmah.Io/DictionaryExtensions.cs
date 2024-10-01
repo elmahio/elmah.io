@@ -89,5 +89,18 @@ namespace Elmah.Io
             const string applicationname = "applicationName";
             return dictionary.ContainsCaseInsensitive(applicationname) ? dictionary.ValueByKeyCaseInsensitive(applicationname) : string.Empty;
         }
+
+        internal static string ProxyHost(this IDictionary dictionary)
+        {
+            const string proxyHost = "proxyHost";
+            return dictionary.ContainsCaseInsensitive(proxyHost) ? dictionary.ValueByKeyCaseInsensitive(proxyHost) : string.Empty;
+        }
+
+        internal static int? ProxyPort(this IDictionary dictionary)
+        {
+            const string proxyPort = "proxyPort";
+            var value = dictionary.ContainsCaseInsensitive(proxyPort) ? dictionary.ValueByKeyCaseInsensitive(proxyPort) : null;
+            return !string.IsNullOrWhiteSpace(value) && int.TryParse(value, out var port) ? port : null;
+        }
     }
 }
