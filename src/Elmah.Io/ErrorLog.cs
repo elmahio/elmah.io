@@ -69,20 +69,12 @@ namespace Elmah.Io
 
             if (Api != null) return;
 
-            var options = new ElmahIoOptions
+            var elmahioApi = ElmahioAPI.Create(apiKey, new ElmahIoOptions
             {
                 Timeout = new TimeSpan(0, 0, 5),
                 UserAgent = UserAgent(),
-            };
-
-            var proxyHost = config.ProxyHost();
-            var proxyPort = config.ProxyPort();
-            if (proxyHost != null && proxyPort != null)
-            {
-                options.WebProxy = new WebProxy(proxyHost, (int)proxyPort);
-            }
-
-            var elmahioApi = ElmahioAPI.Create(apiKey, options);
+                WebProxy = WebRequest.DefaultWebProxy,
+            });
 
             Api = elmahioApi;
         }

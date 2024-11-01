@@ -22,37 +22,6 @@ namespace Elmah.Io.Tests
             Assert.That(dictionary.ApplicationName(), Is.EqualTo(expectedValue));
         }
 
-        [TestCase(null, "proxyHost", null)]
-        [TestCase("", "proxyHost", "")]
-        [TestCase("value", "proxyHost", "value")]
-        [TestCase("value", "proxyHost", "value")]
-        [TestCase("", null, null)]
-        public void CanGetProxyHost(string expectedValue, string key, string value)
-        {
-            var dictionary = new Hashtable();
-            if (!string.IsNullOrWhiteSpace(key))
-            {
-                dictionary.Add(key, value);
-            }
-
-            Assert.That(dictionary.ProxyHost(), Is.EqualTo(expectedValue));
-        }
-
-        [TestCase(null, "proxyPort", null)]
-        [TestCase(null, "proxyPort", "")]
-        [TestCase(5555, "proxyPort", "5555")]
-        [TestCase(6666, "proxyPort", "6666")]
-        public void CanGetProxyPort(int? expectedValue, string key, string value)
-        {
-            var dictionary = new Hashtable();
-            if (!string.IsNullOrWhiteSpace(key))
-            {
-                dictionary.Add(key, value);
-            }
-
-            Assert.That(dictionary.ProxyPort(), Is.EqualTo(expectedValue));
-        }
-
         [TestCase(false, "DC14639C-B930-4960-9A3A-BD73C6CA6375", "logId", "DC14639C-B930-4960-9A3A-BD73C6CA6375")]
         [TestCase(false, "E70628F4-EEED-4C06-B570-663F8AFA80E5", "LogId", "E70628F4-EEED-4C06-B570-663F8AFA80E5")]
         [TestCase(true, null, "logId", "No guid")]
