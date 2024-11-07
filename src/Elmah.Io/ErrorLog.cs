@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http.Headers;
@@ -9,6 +10,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Web;
+using System.Xml.Linq;
 using Elmah.Io.Client;
 
 namespace Elmah.Io
@@ -22,6 +24,7 @@ namespace Elmah.Io
     public class ErrorLog : global::Elmah.ErrorLog, IErrorLog
     {
         internal static readonly string _assemblyVersion = typeof(ErrorLog).Assembly.GetName().Version.ToString();
+        internal static readonly string _elmahIoClientAssemblyVersion = typeof(IElmahioAPI).Assembly.GetName().Version.ToString();
         internal static readonly string _systemWebAssemblyVersion = typeof(HttpApplication).Assembly.GetName().Version.ToString();
 
         /// <summary>
@@ -46,6 +49,8 @@ namespace Elmah.Io
         {
             Api = logger;
             _logId = logId;
+
+            CreateInstallation();
         }
 
         /// <summary>
@@ -77,6 +82,8 @@ namespace Elmah.Io
             });
 
             Api = elmahioApi;
+
+            CreateInstallation();
         }
 
         /// <summary>
@@ -326,6 +333,58 @@ namespace Elmah.Io
                 .Append(" ")
                 .Append(new ProductInfoHeaderValue(new ProductHeaderValue("System.Web", _systemWebAssemblyVersion)).ToString())
                 .ToString();
+        }
+
+        private void CreateInstallation()
+        {
+            try
+            {
+                var logger = new LoggerInfo
+                {
+                    Type = "Elmah.Io",
+                    Properties = [],
+                    ConfigFiles = [],
+                    Assemblies =
+                    [
+                        new AssemblyInfo { Name = "Elmah.Io", Version = _assemblyVersion },
+                        new AssemblyInfo { Name = "Elmah.Io.Client", Version = _elmahIoClientAssemblyVersion },
+                        new AssemblyInfo { Name = "System.Web", Version = _systemWebAssemblyVersion }
+                    ],
+                };
+
+                var installation = new CreateInstallation
+                {
+                    Type = "aspnet",
+                    Name = ApplicationName,
+                    Loggers = [logger]
+                };
+
+                var location = GetType().Assembly.Location;
+                var currentDirectory = Path.GetDirectoryName(location);
+
+                var webConfigFilePath = Path.Combine(currentDirectory, "web.config");
+                if (File.Exists(webConfigFilePath))
+                {
+                    var configXml = XDocument.Load(webConfigFilePath);
+                    var elmahSection = configXml.Descendants("elmah").FirstOrDefault();
+                    if (elmahSection != null)
+                    {
+                        var elmahContent = elmahSection.ToString();
+                        logger.ConfigFiles.Add(new ConfigFile
+                        {
+                            Name = Path.GetFileName(webConfigFilePath),
+                            Content = elmahContent,
+                            ContentType = "application/xml"
+                        });
+                    }
+                }
+
+                Api.Installations.Create(_logId.ToString(), installation);
+            }
+            catch
+            {
+                // We don't want to crash the entire application if the installation fails. Carry on.
+            }
         }
     }
 }
