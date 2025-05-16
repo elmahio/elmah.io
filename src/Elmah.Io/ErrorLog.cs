@@ -350,6 +350,7 @@ namespace Elmah.Io
                         new AssemblyInfo { Name = "Elmah.Io.Client", Version = _elmahIoClientAssemblyVersion },
                         new AssemblyInfo { Name = "System.Web", Version = _systemWebAssemblyVersion }
                     ],
+                    EnvironmentVariables = [],
                 };
 
                 var installation = new CreateInstallation
@@ -378,6 +379,9 @@ namespace Elmah.Io
                         });
                     }
                 }
+
+                if (EnvironmentVariablesHelper.TryGetDotNetEnvironmentVariables(out List<Item> dotNetVariables)) dotNetVariables.ForEach(v => logger.EnvironmentVariables.Add(v));
+                if (EnvironmentVariablesHelper.TryGetAzureEnvironmentVariables(out List<Item> azureVariables)) azureVariables.ForEach(v => logger.EnvironmentVariables.Add(v));
 
                 Api.Installations.Create(_logId.ToString(), installation);
             }
