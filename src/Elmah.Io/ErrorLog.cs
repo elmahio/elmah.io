@@ -380,8 +380,8 @@ namespace Elmah.Io
                     }
                 }
 
-                if (EnvironmentVariablesHelper.TryGetDotNetEnvironmentVariables(out List<Item> dotNetVariables)) dotNetVariables.ForEach(v => logger.EnvironmentVariables.Add(v));
-                if (EnvironmentVariablesHelper.TryGetAzureEnvironmentVariables(out List<Item> azureVariables)) azureVariables.ForEach(v => logger.EnvironmentVariables.Add(v));
+                EnvironmentVariablesHelper.GetDotNetEnvironmentVariables().ForEach(v => logger.EnvironmentVariables.Add(v));
+                EnvironmentVariablesHelper.GetAzureEnvironmentVariables().ForEach(v => logger.EnvironmentVariables.Add(v));
 
                 Api.Installations.Create(_logId.ToString(), installation);
             }
