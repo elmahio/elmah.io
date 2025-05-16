@@ -280,7 +280,7 @@ namespace Elmah.Io
 
         private IList<Item> Itemize(NameValueCollection nameValues)
         {
-            return nameValues.AllKeys.Select(key => new Item { Key = key, Value = nameValues[key] }).ToList();
+            return [.. nameValues.AllKeys.Select(key => new Item { Key = key, Value = nameValues[key] })];
         }
 
         private static int? StatusCode(Error error)
