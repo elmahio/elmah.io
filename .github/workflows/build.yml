@@ -65,7 +65,7 @@ jobs:
         FUNCTION_APP_URL: ${{ secrets.FUNCTION_APP_URL }}
       run: |
         $repoName = ($env:GITHUB_REPOSITORY -split '/')[1]
-        $json = @{ repository = $repoName } | ConvertTo-Json -Compress
+        $json = @{ repository = 'Elmah.Io' } | ConvertTo-Json -Compress
         curl --fail-with-body -X POST `
              -H "Content-Type: application/json" `
              -d "$json" `
