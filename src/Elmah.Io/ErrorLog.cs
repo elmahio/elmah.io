@@ -210,7 +210,7 @@ namespace Elmah.Io
 
             if (asyncResult is not Task<T> task)
             {
-                throw new ArgumentException(null, nameof(asyncResult));
+                throw new ArgumentException("asyncResult is not a Task", nameof(asyncResult));
             }
 
             return task.Result;
