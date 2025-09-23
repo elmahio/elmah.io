@@ -36,7 +36,7 @@ jobs:
       run: nuget pack Elmah.Io.WebApi.nuspec -Version 5.3.${{ github.run_number }} -Properties Configuration=Release -Properties Commit=${{ github.sha }}
 
     - name: Install dotnet-validate
-      run: dotnet tool install --global dotnet-validate --version 0.0.1-preview.304
+      run: dotnet tool install --global dotnet-validate --version 0.0.1-preview.537
     - name: Validate Elmah.Io
       run: dotnet-validate package local elmah.io.5.3.${{ github.run_number }}.nupkg
     - name: Validate Elmah.Io.AspNet
