@@ -1,9 +1,9 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net45</TargetFramework>
+    <TargetFramework>net462</TargetFramework>
     <EnablePackageValidation>true</EnablePackageValidation>
-    <LangVersion>12</LangVersion>
+    <LangVersion>14.0</LangVersion>
     <!-- Version updated through GitHub Actions -->
     <Version>1.0.0</Version>
     <!-- SourceLink -->
@@ -17,12 +17,12 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0" PrivateAssets="All" />
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="10.0.400" PrivateAssets="All" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="elmah.corelibrary" Version="1.2.2" />
-    <PackageReference Include="Elmah.Io.Client" Version="5.3.131" />
+    <PackageReference Include="Elmah.Io.Client" Version="6.0.140-pre" />
   </ItemGroup>
 
   <ItemGroup>

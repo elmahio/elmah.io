@@ -190,7 +190,7 @@ namespace Elmah.Io
                 errorEntryList.Add(entry);
             }
 
-            return messagesResult.Total ?? 0;
+            return messagesResult.Total;
         }
 
         /// <summary>
@@ -245,7 +245,7 @@ namespace Elmah.Io
                 Message = message.Title,
                 Source = message.Source,
                 StatusCode = message.StatusCode ?? 0,
-                Time = message.DateTime.Value.DateTime,
+                Time = message.DateTime.DateTime,
                 Type = message.Type,
                 User = message.User,
             };
@@ -269,7 +269,7 @@ namespace Elmah.Io
                 Message = message.Title,
                 Source = message.Source,
                 StatusCode = message.StatusCode ?? 0,
-                Time = message.DateTime.Value.DateTime,
+                Time = message.DateTime.DateTime,
                 Type = message.Type,
                 User = message.User,
             };

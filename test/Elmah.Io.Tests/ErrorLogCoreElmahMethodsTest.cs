@@ -88,7 +88,7 @@ namespace Elmah.Io.Tests
             var messages = new MessagesResult
             {
                 Total = 3,
-                Messages = new List<MessageOverview> { message1, message2, }
+                Messages = [message1, message2,]
             };
             var results = new ArrayList();
 
