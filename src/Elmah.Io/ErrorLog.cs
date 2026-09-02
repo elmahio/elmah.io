@@ -353,6 +353,8 @@ namespace Elmah.Io
                     EnvironmentVariables = [],
                 };
 
+                logger.Assemblies.TryAddExtensionAssembliesIfLoaded();
+
                 var installation = new CreateInstallation
                 {
                     Type = "aspnet",
