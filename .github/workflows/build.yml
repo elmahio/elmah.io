@@ -2,7 +2,7 @@ name: build
 
 on:
   push:
-    branches: [ main ]
+    branches: [ main, apiv4 ]
   pull_request:
     branches: [ main ]
 
@@ -10,64 +10,68 @@ jobs:
   build:
 
     runs-on: windows-2025
+    permissions:
+      id-token: write
 
     steps:
-    - uses: actions/checkout@v5
+    - uses: actions/checkout@v7
     - name: Setup .NET
-      uses: actions/setup-dotnet@v5
+      uses: actions/setup-dotnet@v6
       with:
-        dotnet-version: 8.0.x
-    - uses: nuget/setup-nuget@v2
+        dotnet-version: 10.0.x
+    - uses: nuget/setup-nuget@v3
     - name: Add msbuild to PATH
-      uses: microsoft/setup-msbuild@v2
+      uses: microsoft/setup-msbuild@v3
     - name: Restore
       run: nuget restore elmah.io.sln
     - name: Build
-      run: msbuild elmah.io.sln /t:Build /p:Configuration=Release /p:Version=5.3.${{ github.run_number }}
+      run: msbuild elmah.io.sln /t:Build /p:Configuration=Release /p:Version=6.0.${{ github.run_number }}-pre
     - name: Test
       run: dotnet vstest test\Elmah.Io.Tests\bin\Release\net472\Elmah.Io.Tests.dll
     - name: Pack Elmah.Io
-      run: nuget pack Elmah.Io.nuspec -Version 5.3.${{ github.run_number }} -Properties Configuration=Release -Properties Commit=${{ github.sha }}
+      run: nuget pack Elmah.Io.nuspec -Version 6.0.${{ github.run_number }}-pre -Properties Configuration=Release -Properties Commit=${{ github.sha }}
     - name: Pack Elmah.Io.AspNet
-      run: nuget pack Elmah.Io.AspNet.nuspec -Version 5.3.${{ github.run_number }} -Properties Configuration=Release -Properties Commit=${{ github.sha }}
+      run: nuget pack Elmah.Io.AspNet.nuspec -Version 6.0.${{ github.run_number }}-pre -Properties Configuration=Release -Properties Commit=${{ github.sha }}
     - name: Pack Elmah.Io.Mvc
-      run: nuget pack Elmah.Io.Mvc.nuspec -Version 5.3.${{ github.run_number }} -Properties Configuration=Release -Properties Commit=${{ github.sha }}
+      run: nuget pack Elmah.Io.Mvc.nuspec -Version 6.0.${{ github.run_number }}-pre -Properties Configuration=Release -Properties Commit=${{ github.sha }}
     - name: Pack Elmah.Io.WebApi
-      run: nuget pack Elmah.Io.WebApi.nuspec -Version 5.3.${{ github.run_number }} -Properties Configuration=Release -Properties Commit=${{ github.sha }}
+      run: nuget pack Elmah.Io.WebApi.nuspec -Version 6.0.${{ github.run_number }}-pre -Properties Configuration=Release -Properties Commit=${{ github.sha }}
 
     - name: Install dotnet-validate
-      run: dotnet tool install --global dotnet-validate --version 0.0.1-preview.537
+      run: dotnet tool install --global dotnet-validate --version 0.0.1-preview.582
     - name: Validate Elmah.Io
-      run: dotnet-validate package local elmah.io.5.3.${{ github.run_number }}.nupkg
+      run: dotnet-validate package local elmah.io.6.0.${{ github.run_number }}-pre.nupkg
     - name: Validate Elmah.Io.AspNet
-      run: dotnet-validate package local Elmah.Io.AspNet.5.3.${{ github.run_number }}.nupkg
+      run: dotnet-validate package local Elmah.Io.AspNet.6.0.${{ github.run_number }}-pre.nupkg
     - name: Validate Elmah.Io.Mvc
-      run: dotnet-validate package local Elmah.Io.Mvc.5.3.${{ github.run_number }}.nupkg
+      run: dotnet-validate package local Elmah.Io.Mvc.6.0.${{ github.run_number }}-pre.nupkg
     - name: Validate Elmah.Io.WebApi
-      run: dotnet-validate package local Elmah.Io.WebApi.5.3.${{ github.run_number }}.nupkg
+      run: dotnet-validate package local Elmah.Io.WebApi.6.0.${{ github.run_number }}-pre.nupkg
+
+    - name: NuGet login (OIDC → temp API key)
+      uses: NuGet/login@v1
+      id: nuget-login
+      with:
+        user: ${{ secrets.NUGET_USER }}
+      if: ${{ github.event_name == 'push' }}
 
     - name: Push Elmah.Io
-      run: dotnet nuget push Elmah.Io.5.3.${{ github.run_number }}.nupkg --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json
+      run: dotnet nuget push Elmah.Io.6.0.${{ github.run_number }}-pre.nupkg --api-key ${{ steps.nuget-login.outputs.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json
       if: ${{ github.event_name == 'push' }}
     - name: Push Elmah.Io.AspNet
-      run: dotnet nuget push Elmah.Io.AspNet.5.3.${{ github.run_number }}.nupkg --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json
+      run: dotnet nuget push Elmah.Io.AspNet.6.0.${{ github.run_number }}-pre.nupkg --api-key ${{ steps.nuget-login.outputs.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json
       if: ${{ github.event_name == 'push' }}
     - name: Push Elmah.Io.Mvc
-      run: dotnet nuget push Elmah.Io.Mvc.5.3.${{ github.run_number }}.nupkg --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json
+      run: dotnet nuget push Elmah.Io.Mvc.6.0.${{ github.run_number }}-pre.nupkg --api-key ${{ steps.nuget-login.outputs.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json
       if: ${{ github.event_name == 'push' }}
     - name: Push Elmah.Io.WebApi
-      run: dotnet nuget push Elmah.Io.WebApi.5.3.${{ github.run_number }}.nupkg --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json
+      run: dotnet nuget push Elmah.Io.WebApi.6.0.${{ github.run_number }}-pre.nupkg --api-key ${{ steps.nuget-login.outputs.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json
       if: ${{ github.event_name == 'push' }}
 
-    - name: Refresh Bugster
-      shell: pwsh
-      env:
-        FUNCTION_APP_URL: ${{ secrets.FUNCTION_APP_URL }}
-      run: |
-        $repoName = ($env:GITHUB_REPOSITORY -split '/')[1]
-        $json = @{ repository = 'Elmah.Io' } | ConvertTo-Json -Compress
-        curl --fail-with-body -X POST `
-             -H "Content-Type: application/json" `
-             -d "$json" `
-             $env:FUNCTION_APP_URL
-      if: ${{ github.event_name == 'push' }}
+    # - name: Refresh Bugster
+    #   uses: elmahio/actions/refresh-bugster-repository@v1.2
+    #   with:
+    #     signing: ${{ secrets.BUGSTER_SIGNING_KEY }}
+    #     url: ${{ secrets.FUNCTION_APP_URL }}
+    #     repository: ${{ github.event.repository.name }}
+    #   if: ${{ github.event_name == 'push' && github.ref_name == 'main' }}
