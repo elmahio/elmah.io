@@ -385,7 +385,7 @@ namespace Elmah.Io
                 EnvironmentVariablesHelper.GetDotNetEnvironmentVariables().ForEach(v => logger.EnvironmentVariables.Add(v));
                 EnvironmentVariablesHelper.GetAzureEnvironmentVariables().ForEach(v => logger.EnvironmentVariables.Add(v));
 
-                Api.Installations.Create(_logId.ToString(), installation);
+                Api.Installations.CreateAndNotify(_logId, installation);
             }
             catch
             {
